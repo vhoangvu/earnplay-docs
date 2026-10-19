@@ -20,9 +20,10 @@ go back through `SOP_updating_docs.md`.
 
 ## 3. The review loop (per task)
 
-1. **Read the task.** The task card plus every section its References field cites, plus
-   the relevant design (HLD/LLD). This is the spec you judge everything against —
-   read it before the report, so you know what was supposed to be built.
+1. **Read the source of truth, then the task.** Read `00-source-of-truth.md` fully first —
+   same as the implementer. Then the task card plus every section its References field
+   cites, plus the relevant design (HLD/LLD). This is the spec you judge everything
+   against — read it before the report, so you know what was supposed to be built.
 2. **Read the report.** It must be complete: every automated and manual test and every
    acceptance criterion addressed, ambiguous decisions stated. An incomplete report
    goes back before any code is read.
