@@ -163,6 +163,139 @@ test('T8.6 parses judge JSON defensively', () => {
   assert.strictEqual(A.parseJudgeResponse('not JSON'), null);
 });
 
+test('T8.7 all three backends conform to the shared interface', () => {
+  const backends = [
+    A.createModelBackend('browser'),
+    A.createModelBackend('local', { baseUrl: 'http://localhost:11434/v1', model: 'llama' }),
+    A.createModelBackend('cloud', { baseUrl: 'https://example.com/v1', model: 'model', apiKey: 'test-key-value' })
+  ];
+  backends.forEach((backend) => {
+    assert(backend instanceof A.ModelBackend);
+    assert(backend.id && backend.label && backend.status);
+    assert.strictEqual(typeof backend.draft, 'function');
+    assert.strictEqual(typeof backend.judge, 'function');
+  });
+});
+
+test('T8.7 local backend lists models and sends OpenAI-compatible requests', async () => {
+  const calls = [];
+  const local = A.createModelBackend('local', {
+    baseUrl: 'http://localhost:11434/v1/',
+    model: 'llama3',
+    fetch: async (url, options) => {
+      calls.push({ url, options });
+      return {
+        ok: true,
+        json: async () => options.method !== 'POST' ?
+          { data: [{ id: 'llama3' }, { id: 'qwen' }] } :
+          { choices: [{ message: { content: '{"verdict":"trying","justification":"Worked steadily."}' } }] }
+      };
+    }
+  });
+  assert.deepStrictEqual(await local.testConnection(), ['llama3', 'qwen']);
+  const prompt = 'Judge this transcript.';
+  assert.strictEqual(await local.judge(prompt),
+    '{"verdict":"trying","justification":"Worked steadily."}');
+  assert.strictEqual(calls[0].url, 'http://localhost:11434/v1/models');
+  assert.strictEqual(calls[0].options.method, undefined);
+  assert.strictEqual(calls[1].url, 'http://localhost:11434/v1/chat/completions');
+  assert.strictEqual(calls[1].options.method, 'POST');
+  assert.strictEqual(calls[1].options.headers.Authorization, undefined);
+  assert.deepStrictEqual(JSON.parse(calls[1].options.body), {
+    model: 'llama3',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.3,
+    max_tokens: 160
+  });
+});
+
+test('T8.7 cloud backend sends its key only as bearer authorization over HTTPS', async () => {
+  const calls = [];
+  const cloud = A.createModelBackend('cloud', {
+    baseUrl: 'https://api.example.com/v1',
+    model: 'reasoner',
+    apiKey: 'test-key-value',
+    fetch: async (url, options) => {
+      calls.push({ url, options });
+      return { ok: true, json: async () => ({ choices: [{ message: { content: 'A guiding question.' } }] }) };
+    }
+  });
+  assert.strictEqual(await cloud.draft('Give a nudge.'), 'A guiding question.');
+  assert.strictEqual(calls[0].url, 'https://api.example.com/v1/chat/completions');
+  assert.strictEqual(calls[0].options.headers.Authorization, 'Bearer ' + 'test-key-value');
+  assert(!calls[0].options.body.includes('test-key-value'));
+  const insecure = A.createModelBackend('cloud', {
+    baseUrl: 'http://api.example.com/v1', model: 'reasoner', apiKey: 'test-key-value',
+    fetch: async () => { throw new Error('Should not fetch an insecure endpoint'); }
+  });
+  await assert.rejects(() => insecure.draft('prompt'), /HTTPS/);
+});
+
+test('T8.7 identical leak rejection and three-attempt fallback apply to all backends', async () => {
+  const fallback = 'Try splitting the problem into steps.';
+  const backends = [
+    new A.BrowserModelBackend({ generate: async () => 'The answer is 86.' }),
+    A.createModelBackend('local', {
+      baseUrl: 'http://localhost:11434/v1', model: 'llama',
+      fetch: async () => ({ ok: true, json: async () => ({ choices: [{ message: { content: 'The answer is 86.' } }] }) })
+    }),
+    A.createModelBackend('cloud', {
+      baseUrl: 'https://api.example.com/v1', model: 'model', apiKey: 'test-key-value',
+      fetch: async () => ({ ok: true, json: async () => ({ choices: [{ message: { content: 'The answer is 86.' } }] }) })
+    })
+  ];
+  for (const backend of backends) {
+    let attempts = 0;
+    const message = await A.draftTutorMessage(async (prompt) => {
+      attempts++;
+      return backend.draft(prompt);
+    }, 'Tutor prompt', 86, fallback);
+    assert.strictEqual(message, fallback, backend.id);
+    assert.strictEqual(attempts, 3, backend.id);
+  }
+});
+
+test('T8.7 network failure degrades to the canned line and marks the backend unavailable', async () => {
+  const backends = [
+    new A.BrowserModelBackend({ generate: async () => { throw new Error('offline'); } }),
+    A.createModelBackend('local', {
+      baseUrl: 'http://localhost:11434/v1', model: 'llama',
+      fetch: async () => { throw new Error('offline'); }
+    }),
+    A.createModelBackend('cloud', {
+      baseUrl: 'https://api.example.com/v1', model: 'model', apiKey: 'test-key-value',
+      fetch: async () => { throw new Error('offline'); }
+    })
+  ];
+  for (const backend of backends) {
+    assert.strictEqual(await A.draftTutorMessage(
+      (prompt) => backend.draft(prompt), 'Tutor prompt', 86, 'Try another step.'), 'Try another step.');
+    assert.strictEqual(backend.status, 'unavailable', backend.id);
+  }
+});
+
+test('T8.7 cloud API key is not written to localStorage', async () => {
+  const previousStorage = global.localStorage;
+  const stored = {};
+  global.localStorage = {
+    setItem: (key, value) => { stored[key] = value; },
+    getItem: (key) => stored[key]
+  };
+  try {
+    const cloud = A.createModelBackend('cloud', {
+      baseUrl: 'https://api.example.com/v1', model: 'model', apiKey: 'test-key-value',
+      fetch: async () => ({ ok: true, json: async () => ({ choices: [{ message: { content: 'Hint.' } }] }) })
+    });
+    await cloud.draft('Tutor prompt.');
+    await cloud.judge('Judge transcript.');
+    assert.deepStrictEqual(stored, {});
+    assert(!JSON.stringify(stored).includes('test-key-value'));
+  } finally {
+    if (previousStorage === undefined) delete global.localStorage;
+    else global.localStorage = previousStorage;
+  }
+});
+
 Promise.all(pendingTests).then(() => {
   console.log(failures ? failures + ' FAILED' : 'ALL PASSED');
   process.exit(failures ? 1 : 0);

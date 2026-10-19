@@ -55,6 +55,10 @@
   [data-component="unlock-banner"] { color: var(--color-text); padding: var(--space-16); border-radius: var(--radius-card); }
   .judge-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-8); padding: var(--space-12); border-radius: var(--radius-card); background-color: var(--color-surface); }
   .judge-panel.disagreement { border-left: var(--border-width) solid var(--color-warning); }
+  .ai-panel, .ai-config { display: grid; gap: var(--space-8); padding: var(--space-12); border-radius: var(--radius-card); background-color: var(--color-surface); }
+  .ai-config[hidden] { display: none; }
+  .ai-config label { display: block; }
+  .ai-config input, .ai-panel select { box-sizing: border-box; width: var(--size-full); padding: var(--space-8); border: var(--border-width) solid var(--color-text-secondary); border-radius: var(--radius-button); color: var(--color-text); background-color: var(--color-surface); }
   table { border-collapse: collapse; width: var(--size-full); font-size: var(--font-size-caption); }
   td, th { border: var(--border-width) solid var(--color-text-secondary); padding: var(--space-4); vertical-align: top; text-align: left; }
   .note { color: var(--color-text-secondary); font-size: var(--font-size-caption); }
@@ -86,10 +90,44 @@
     <button type="button" id="finish-btn">Finish session</button>
   </div>
   <div id="hints"></div>
-  <div>
+  <section class="ai-panel" aria-label="AI tutor settings">
+    <label for="backend-select">AI tutor backend</label>
+    <select id="backend-select">
+      <option value="browser">Browser (default)</option>
+      <option value="local">Local</option>
+      <option value="cloud">Cloud</option>
+    </select>
+    <div id="browser-config" class="ai-config">
+      <span>Runs on this device. The model downloads only after you enable the AI tutor.</span>
+      <span id="browser-status" class="note" aria-live="polite">Browser backend: off.</span>
+    </div>
+    <div id="local-config" class="ai-config" hidden>
+      <label for="local-base-url">Base URL
+        <input type="text" id="local-base-url" value="http://localhost:11434/v1" autocomplete="url">
+      </label>
+      <label for="local-model">Model name
+        <input type="text" id="local-model" autocomplete="off">
+      </label>
+      <button type="button" id="test-local-btn">Test connection</button>
+      <span id="local-status" class="note" aria-live="polite">Not connected.</span>
+    </div>
+    <div id="cloud-config" class="ai-config" hidden>
+      <label for="cloud-base-url">HTTPS base URL
+        <input type="text" id="cloud-base-url" placeholder="https://example.com/v1" autocomplete="url">
+      </label>
+      <label for="cloud-model">Model name
+        <input type="text" id="cloud-model" autocomplete="off">
+      </label>
+      <label for="cloud-api-key">API key (kept in memory only)
+        <input type="password" id="cloud-api-key" autocomplete="off">
+      </label>
+      <button type="button" id="test-cloud-btn">Test connection</button>
+      <span id="cloud-status" class="note" aria-live="polite">Not connected. The key is cleared when this page is reloaded.</span>
+    </div>
+    <p class="note">Local and cloud servers must allow CORS requests from this page. For Ollama, set OLLAMA_ORIGINS to allow the pilot's origin.</p>
     <button type="button" id="enable-model-btn">Enable AI tutor</button>
     <span id="ai-status" class="note" aria-live="polite">AI tutor is off. Your session works without it.</span>
-  </div>
+  </section>
 </main>
 
 <main id="screen-decision" hidden>
