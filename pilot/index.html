@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EarnPlay pilot (web proof of concept)</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 1rem auto; padding: 0 1rem; color: #222; }
+  header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: .5rem; }
+  #question { font-size: 1.25rem; white-space: pre-line; margin: 1rem 0; }
+  input[type=text] { font-size: 1.1rem; padding: .4rem; width: 12rem; }
+  textarea { width: 100%; box-sizing: border-box; }
+  button { font-size: 1rem; padding: .4rem .9rem; margin: .25rem .25rem .25rem 0; }
+  .good { color: #0a7a2f; } .bad { color: #b3261e; }
+  #hints p { background: #fff7d6; padding: .5rem; border-radius: 4px; }
+  #decision.unlocked { background: #e3f6e8; } #decision.locked { background: #f3f3f3; }
+  #decision { padding: 1.5rem; border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  td, th { border: 1px solid #ccc; padding: .3rem; vertical-align: top; text-align: left; }
+  .note { color: #666; font-size: .85rem; }
+</style>
+</head>
+<body>
+<header>
+  <strong>EarnPlay pilot</strong>
+  <span>Active time: <span id="timer">0:00</span><span id="timer-state" class="note"></span></span>
+</header>
+
+<main id="screen-quiz">
+  <p id="progress" class="note"></p>
+  <div id="question"></div>
+  <form id="answer-form" autocomplete="off">
+    <label for="answer">Your answer</label><br>
+    <input type="text" id="answer" inputmode="decimal">
+    <button type="submit" id="submit-btn">Submit</button>
+    <div id="explain-wrap" hidden>
+      <label for="explain">Why is it wrong? (optional)</label>
+      <textarea id="explain" rows="2"></textarea>
+    </div>
+  </form>
+  <div id="feedback" role="status"></div>
+  <div>
+    <button type="button" id="hint-btn">Hint</button>
+    <button type="button" id="skip-btn">Skip</button>
+    <button type="button" id="next-btn" hidden>Next question</button>
+    <button type="button" id="finish-btn">Finish session</button>
+  </div>
+  <div id="hints"></div>
+</main>
+
+<main id="screen-decision" hidden>
+  <div id="decision">
+    <h1 id="decision-title"></h1>
+    <p id="decision-note" class="note"></p>
+    <p id="decision-text"></p>
+  </div>
+  <button type="button" id="transcript-btn">View admin transcript</button>
+  <button type="button" id="restart-btn">Start a new session</button>
+</main>
+
+<main id="screen-transcript" hidden>
+  <h1>Admin transcript (read-only)</h1>
+  <p id="transcript-count" class="note"></p>
+  <table>
+    <thead><tr><th>Elapsed</th><th>Timestamp</th><th>Event</th></tr></thead>
+    <tbody id="transcript-body"></tbody>
+  </table>
+  <h2>Effort signals</h2>
+  <p id="transcript-signals"></p>
+  <h2>Decision</h2>
+  <p id="transcript-decision"></p>
+  <button type="button" id="back-btn">Back</button>
+  <button type="button" id="restart-btn2">Start a new session</button>
+</main>
+
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
