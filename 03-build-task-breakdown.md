@@ -43,7 +43,9 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   7 --- CI/CD and release automation   T7.1--T7.5 (5)    4 / 1 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification; App Store submission prep in v1
 
-  **Total**                            **44 tasks**      **33 / 6 / 5**           **Demo is the definition of done for the hackathon**
+  8 --- Pilot web PoC                  T8.1--T8.5 (5)    5 / 0 / 0                Web proof of concept of the core loop; validates the interaction design and tests coding-agent build performance
+
+  **Total**                            **49 tasks**      **38 / 6 / 5**           **Demo is the definition of done for the hackathon**
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Reading a task block:** Every task gives its ID and title, what to build, a verifiable acceptance line, its dependencies, its size, and its scope tag. Work a task only when its dependencies are done --- the dependency line is the gate, not a suggestion.
@@ -888,6 +890,102 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **References:** SSOT-ci-cd-and-release; HLD-ci-cd-and-release-process; LLD-ci-cd-pipeline; LLD-demo-mapping-real-vs-simulated-in-the-10-day-demo
 
+## Epic 8 --- Pilot web PoC \[TASKS-epic-8-pilot-web-poc\]
+
+------------------------------------------------------------------------
+
+*Pre-kickoff validation, sequenced before Epic 0. A quick web-based proof of concept of the core tutor loop (challenge → effort judgment → simulated unlock), built to validate the interaction design with a real child and to test coding-agent build performance on a small, well-specified feature. Web-only, throwaway code --- nothing ships in the iOS app. All five tasks are Demo scope.*
+
+### T8.1 --- Pilot web scaffold \[TASKS-t8-1-pilot-web-scaffold\]
+
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** ---
+
+**What to build:** Single-page web app (plain HTML/JS, no backend, no build step): question display, answer input, hint button, session timer with idle detection, and a mock unlock screen.
+
+> **Inputs:** HLD Pilot section; the 4th-grade skill list (same skills as T0.3).
+>
+> **Outputs:** index.html (+ app.js) runnable by opening in a browser; mock unlock screen.
+>
+> **Automated test:** N/A --- static page; verifiable instead: page loads with zero console errors; timer pauses after \~20 seconds of no input.
+>
+> **Manual test:** 1) Open index.html --- question renders. 2) Type an answer, submit --- feedback appears. 3) Tap Hint --- hint text appears. 4) Leave idle 25 seconds --- timer display stops advancing. 5) Trigger the unlock path --- mock \"unlocked for 30 minutes\" screen appears.
+>
+> **✓ Acceptance criteria:** Page runs from a file:// open with no server; all five manual checks pass; zero console errors on load.
+>
+> **References:** SSOT-canonical-facts-scope; HLD-pilot-web-proof-of-concept; HLD-grade-bands
+
+### T8.2 --- Pilot question bank \[TASKS-t8-2-pilot-question-bank\]
+
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T8.1
+
+**What to build:** 12 varied-form 4th-grade math questions (stories, reverse problems, estimation, "which one is wrong and why"), each with a verified answer, loaded by the pilot page; no plain textbook drills.
+
+> **Inputs:** SSOT question forms; T8.1 scaffold.
+>
+> **Outputs:** questions.js with 12 questions + verified answers, wired into the page.
+>
+> **Automated test:** Node/browser-console check --- every stored answer matches an independent hand computation, 12/12.
+>
+> **Manual test:** 1) Load the page --- all 12 questions reachable in sequence. 2) Answer one correctly --- marked correct. 3) Answer one wrongly --- marked incorrect, correct answer NOT revealed, retry allowed.
+>
+> **✓ Acceptance criteria:** 12 questions, every one in a non-textbook form; 12/12 answers verified; a wrong answer never reveals the correct one.
+>
+> **References:** SSOT-canonical-facts-questions-and-hints; SSOT-canonical-facts-scope; HLD-pilot-web-proof-of-concept
+
+### T8.3 --- Pilot effort scorer + simulated unlock \[TASKS-t8-3-pilot-effort-scorer-simulated-unlock\]
+
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T8.1, T8.2
+
+**What to build:** Deterministic effort scoring (active minutes idle-paused after \~20s, attempts, revisions, hint interactions), the floor rule (at least one genuine attempt + one real hint/follow-up interaction --- below the floor, no unlock regardless of elapsed time), a variable per-session threshold, and the unlock decision with a one-paragraph justification plus the mock unlock screen.
+
+> **Inputs:** T8.1 scaffold; T8.2 question bank; SSOT effort numbers.
+>
+> **Outputs:** Scorer module in app.js; justification text rendered with the decision; mock unlock screen wired to the decision.
+>
+> **Automated test:** Scripted session fixtures --- (a) active trying with wrong answers → unlock; (b) pure idling (no input) → no unlock; (c) instant guessing (sub-2s answers) → no unlock. Pass: 3/3 fixtures decide correctly.
+>
+> **Manual test:** 1) Work through genuinely, get answers wrong --- unlock screen appears with a justification naming what was tried. 2) Open the page and wait --- no unlock. 3) Guess instantly on everything --- no unlock.
+>
+> **✓ Acceptance criteria:** All three fixtures and all three manual checks agree; below-floor sessions never unlock no matter how much time passes.
+>
+> **References:** SSOT-canonical-facts-effort-model; SSOT-canonical-facts-scope; HLD-pilot-web-proof-of-concept; LLD-floor-rule-hard-gate; LLD-effort-scoring-algorithm
+
+### T8.4 --- Pilot admin transcript view \[TASKS-t8-4-pilot-admin-transcript-view\]
+
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T8.1, T8.2, T8.3
+
+**What to build:** Read-only transcript view for the just-finished session: every question, attempt, hint event, effort signal values, and the decision with its justification.
+
+> **Inputs:** T8.1--T8.3.
+>
+> **Outputs:** Transcript view in the pilot page, reachable from the decision screen.
+>
+> **Automated test:** N/A --- read-only view; verifiable instead: after a scripted fixture session, the transcript lists every event with timestamps in order; event count matches the fixture\'s log.
+>
+> **Manual test:** 1) Finish a session --- open the transcript; expected: all questions, attempts, and hints present in order. 2) Check the effort-signals line --- active minutes, attempts, revisions, hints all shown.
+>
+> **✓ Acceptance criteria:** Transcript is complete and time-ordered for a full session; nothing the child did is missing.
+>
+> **References:** SSOT-canonical-facts-scope; HLD-pilot-web-proof-of-concept; LLD-pilot-web-poc-module-mapping
+
+### T8.5 --- Copilot pilot build evaluation \[TASKS-t8-5-copilot-pilot-build-evaluation\]
+
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T8.1, T8.2, T8.3, T8.4
+
+**What to build:** Hand the pilot spec (HLD Pilot section + T8.1--T8.4) to the Copilot coding agent as a build issue, then grade the delivered build on correctness (acceptance lines pass), completeness (all four tasks\' outputs present), and code quality (readable, no dead code). Record a go/no-go note on delegating 10-day build work to the agent.
+
+> **Inputs:** Finished T8.1--T8.4 specs; the repo with the Pilot section.
+>
+> **Outputs:** Graded build report (grade per task + overall), recorded in the project notes with evidence.
+>
+> **Automated test:** N/A --- evaluation is human judgment; verifiable instead: the grading rubric is written BEFORE the agent builds; every acceptance line is attempted against the delivered page.
+>
+> **Manual test:** 1) File the build issue --- agent accepts. 2) Run the delivered page through the T8.1--T8.4 acceptance lines. 3) Grade per the rubric.
+>
+> **✓ Acceptance criteria:** Rubric written first; every acceptance line attempted; grades recorded with evidence (what passed, what failed, with logs or screenshots).
+>
+> **References:** SSOT-canonical-facts-scope; HLD-pilot-web-proof-of-concept
+
 ## Dependency map \[TASKS-dependency-map\]
 
 The chains that matter most. If a task on the left slips, everything to its right slips with it.
@@ -910,10 +1008,14 @@ The chains that matter most. If a task on the left slips, everything to its righ
   **CI/CD and release**               T0.1 Workspace → T7.1 CI pipeline → T7.2 TestFlight upload → T7.5 On-device verification; T7.1 → T7.3 Versioning; T7.2 → T7.4 Submission prep (v1)
 
   **Grade-adaptive UX**               T0.1 Scaffolding → T1.7 Read-aloud (Demo); T1.7 + T1.1 / T1.2 / T1.3 Demo screens → T6.7 Band A variants (v1), T6.8 Copy packs (v1)
+
+  **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation (pre-kickoff validation; informs Epic 1)
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Demo definition of done --- 33 tasks \[TASKS-demo-definition-of-done-33-tasks\]
+## Demo definition of done --- 38 tasks \[TASKS-demo-definition-of-done-33-tasks\]
 
-**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.3, T4.4, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.2, T7.3, T7.5.
+**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.3, T4.4, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.2, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5.
 
 Held back until Demo is green: T0.4 (v1), T3.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
+
+Epic 8 is pre-kickoff validation, sequenced before Epic 0: it validates the interaction design and the agent workflow before the iOS build starts.

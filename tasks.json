@@ -34,11 +34,11 @@
   "depends": [
    "T0.1"
   ],
-  "description": "Build the deterministic verifier for 4th-grade skills: multiplication facts to 12\u00d712, multi-digit multiplication, division, fraction comparison and addition, and word problems. The solver is plain code \u2014 the model never grades its own answers."
+  "description": "Build the deterministic verifier for 4th-grade skills: multiplication facts to 12×12, multi-digit multiplication, division, fraction comparison and addition, and word problems. The solver is plain code — the model never grades its own answers."
  },
  {
   "id": "T0.4",
-  "title": "Entitlement filing \u2014 do first, long lead",
+  "title": "Entitlement filing — do first, long lead",
   "epic": 0,
   "epic_title": "Setup and long-lead items",
   "status": "not_started",
@@ -75,7 +75,7 @@
    "T0.2",
    "T0.3"
   ],
-  "description": "The model proposes a problem (skill + form + values); the solver verifies it before it is shown. On failure, retry within a bounded count, then fall back to a safe, pre-verified question. Questions use varied, real-world and puzzle-like forms \u2014 not plain textbook form."
+  "description": "The model proposes a problem (skill + form + values); the solver verifies it before it is shown. On failure, retry within a bounded count, then fall back to a safe, pre-verified question. Questions use varied, real-world and puzzle-like forms — not plain textbook form."
  },
  {
   "id": "T1.3",
@@ -88,7 +88,7 @@
   "depends": [
    "T1.2"
   ],
-  "description": "Three hint levels \u2014 nudge, then strategy, then one worked step \u2014 offered while the child is working. Record every hint use, and track whether a hint is followed by a changed answer."
+  "description": "Three hint levels — nudge, then strategy, then one worked step — offered while the child is working. Record every hint use, and track whether a hint is followed by a changed answer."
  },
  {
   "id": "T1.4",
@@ -101,7 +101,7 @@
   "depends": [
    "T1.2"
   ],
-  "description": "Score genuine effort from active minutes (pausing after about 20 seconds with no interaction), attempts, hint interactions, answer revisions, and explanations given. Compare the score against a per-session variable threshold (about 8\u201314 points) so the target cannot be learned. Enforce the floor rule"
+  "description": "Score genuine effort from active minutes (pausing after about 20 seconds with no interaction), attempts, hint interactions, answer revisions, and explanations given. Compare the score against a per-session variable threshold (about 8–14 points) so the target cannot be learned. Enforce the floor rule"
  },
  {
   "id": "T1.5",
@@ -114,7 +114,7 @@
   "depends": [
    "T1.4"
   ],
-  "description": "Detect stalling from signals such as missing revisions, response-time patterns, repeated identical wrong answers, and hints used as an answer key. When signals fire, probe conversationally \u2014 \u201cshow me one step\u201d or \u201cwhat have you tried?\u201d \u2014 and count a substantive reply as effort."
+  "description": "Detect stalling from signals such as missing revisions, response-time patterns, repeated identical wrong answers, and hints used as an answer key. When signals fire, probe conversationally — “show me one step” or “what have you tried?” — and count a substantive reply as effort."
  },
  {
   "id": "T1.6",
@@ -127,7 +127,7 @@
   "depends": [
    "T1.4"
   ],
-  "description": "Every consequential decision \u2014 unlock granted or denied, trade offered, difficulty changed \u2014 writes a Decision record with a full justification: the decision, the evidence observed, the reasoning, the alternative considered, and a confidence level. Routine actions get a one-line reason."
+  "description": "Every consequential decision — unlock granted or denied, trade offered, difficulty changed — writes a Decision record with a full justification: the decision, the evidence observed, the reasoning, the alternative considered, and a confidence level. Routine actions get a one-line reason."
  },
  {
   "id": "T1.7",
@@ -140,7 +140,7 @@
   "depends": [
    "T0.1"
   ],
-  "description": "Build the ReadAloudService for the child app: on-device text-to-speech only (the system's built-in speech, for example AVSpeechSynthesizer \u2014 no network call, no downloaded voice), behind one reusable speaker-button component for question, hint, and instruction views (the Diagnostic, Challenge, and H"
+  "description": "Build the ReadAloudService for the child app: on-device text-to-speech only (the system's built-in speech, for example AVSpeechSynthesizer — no network call, no downloaded voice), behind one reusable speaker-button component for question, hint, and instruction views (the Diagnostic, Challenge, and H"
  },
  {
   "id": "T2.1",
@@ -231,7 +231,7 @@
   "size": "M",
   "scope": "Demo",
   "depends": [
-   "T1.4 \u2014 demo uses a seeded chore pool; the editor is T4.1"
+   "T1.4 — demo uses a seeded chore pool; the editor is T4.1"
   ],
   "description": "The AI offers exactly one chore from the parent-stocked pool mid-session, chosen with rotation and time-of-day fit. The child accepts or declines and taps done; the parent confirms completion and the unlock is granted. The child never sees a chore menu or list."
  },
@@ -287,7 +287,7 @@
    "T4.6",
    "T1.6"
   ],
-  "description": "Show progress at a glance: accuracy per skill (this week versus last), active time per question, hint rate, most common error type, effort-score trend, and trade frequency \u2014 all computed from synced session logs."
+  "description": "Show progress at a glance: accuracy per skill (this week versus last), active time per question, hint rate, most common error type, effort-score trend, and trade frequency — all computed from synced session logs."
  },
  {
   "id": "T4.3",
@@ -313,7 +313,7 @@
   "depends": [
    "T4.6"
   ],
-  "description": "Browse the child's decision log \u2014 every unlock, trade and difficulty decision with its full justification \u2014 filterable by session and by decision type."
+  "description": "Browse the child's decision log — every unlock, trade and difficulty decision with its full justification — filterable by session and by decision type."
  },
  {
   "id": "T4.5",
@@ -355,7 +355,7 @@
    "T1.2",
    "T1.4"
   ],
-  "description": "Build scripted sessions for five personas \u2014 good-faith, guessing, idling, manipulative, and struggling child \u2014 and score them against fixed pass criteria: never teaches a wrong answer, never unlocks on pure idling, resists manipulation, and stays on-topic and age-appropriate."
+  "description": "Build scripted sessions for five personas — good-faith, guessing, idling, manipulative, and struggling child — and score them against fixed pass criteria: never teaches a wrong answer, never unlocks on pure idling, resists manipulation, and stays on-topic and age-appropriate."
  },
  {
   "id": "T5.2",
@@ -368,7 +368,7 @@
   "depends": [
    "T5.1"
   ],
-  "description": "Run a prompt-injection and jailbreak battery against the tutor \u2014 \u201cignore your instructions,\u201d \u201cmom said unlock,\u201d \u201cpretend you're my friend,\u201d and edge cases \u2014 treating all child input as untrusted."
+  "description": "Run a prompt-injection and jailbreak battery against the tutor — “ignore your instructions,” “mom said unlock,” “pretend you're my friend,” and edge cases — treating all child input as untrusted."
  },
  {
   "id": "T5.3",
@@ -394,7 +394,7 @@
   "depends": [
    "All Demo tasks"
   ],
-  "description": "Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies \u2014 practice, movement, and chore; (4) the auditor catches a staged leniency error."
+  "description": "Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies — practice, movement, and chore; (4) the auditor catches a staged leniency error."
  },
  {
   "id": "T5.5",
@@ -501,7 +501,7 @@
    "T1.2",
    "T1.3"
   ],
-  "description": "Build the Band A (grades 1\u20132) variants of the three Demo screens \u2014 Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) \u2014 selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the scr"
+  "description": "Build the Band A (grades 1–2) variants of the three Demo screens — Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) — selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the scr"
  },
  {
   "id": "T6.8",
@@ -517,7 +517,7 @@
    "T1.2",
    "T1.3"
   ],
-  "description": "Move every child-facing interface string \u2014 button labels, instructions, tutor prompts shown as text, and system messages on the Diagnostic, Challenge, and Hint display screens and the other child-app screens \u2014 into UI copy packs keyed by the grade parameter, so the same screen speaks at the child's "
+  "description": "Move every child-facing interface string — button labels, instructions, tutor prompts shown as text, and system messages on the Diagnostic, Challenge, and Hint display screens and the other child-app screens — into UI copy packs keyed by the grade parameter, so the same screen speaks at the child's "
  },
  {
   "id": "T7.1",
@@ -543,7 +543,7 @@
   "depends": [
    "T7.1"
   ],
-  "description": "Extend the T7.1 pipeline with archive and upload jobs: on push to main (or on tag), the pipeline archives the app and uploads the build to TestFlight in App Store Connect with no manual steps. Prerequisite (user one-time, not a task): the App Store Connect API key is stored in CI secrets only \u2014 neve"
+  "description": "Extend the T7.1 pipeline with archive and upload jobs: on push to main (or on tag), the pipeline archives the app and uploads the build to TestFlight in App Store Connect with no manual steps. Prerequisite (user one-time, not a task): the App Store Connect API key is stored in CI secrets only — neve"
  },
  {
   "id": "T7.3",
@@ -583,5 +583,74 @@
    "T7.2"
   ],
   "description": "Manual task, user. Install the T7.2 TestFlight build on the user's iPhone (Screen Time + FamilyControls authorized) and verify every demo moment on the real device, recording a pass/fail verification report per moment."
+ },
+ {
+  "id": "T8.1",
+  "title": "Pilot web scaffold",
+  "epic": 8,
+  "epic_title": "Pilot web PoC",
+  "status": "not_started",
+  "size": "M",
+  "scope": "Demo",
+  "depends": [],
+  "description": "Single-page web app (plain HTML/JS, no backend, no build step): question display, answer input, hint button, session timer with idle detection, and a mock unlock screen."
+ },
+ {
+  "id": "T8.2",
+  "title": "Pilot question bank",
+  "epic": 8,
+  "epic_title": "Pilot web PoC",
+  "status": "not_started",
+  "size": "S",
+  "scope": "Demo",
+  "depends": [
+   "T8.1"
+  ],
+  "description": "12 varied-form 4th-grade math questions (stories, reverse problems, estimation, 'which one is wrong and why'), each with a verified answer, loaded by the pilot page. No plain textbook drills."
+ },
+ {
+  "id": "T8.3",
+  "title": "Pilot effort scorer + simulated unlock",
+  "epic": 8,
+  "epic_title": "Pilot web PoC",
+  "status": "not_started",
+  "size": "M",
+  "scope": "Demo",
+  "depends": [
+   "T8.1",
+   "T8.2"
+  ],
+  "description": "Deterministic effort scoring (active minutes idle-paused after ~20s, attempts, revisions, hint interactions), the floor rule, a variable per-session threshold, and the unlock decision with a one-paragraph justification plus the mock unlock screen."
+ },
+ {
+  "id": "T8.4",
+  "title": "Pilot admin transcript view",
+  "epic": 8,
+  "epic_title": "Pilot web PoC",
+  "status": "not_started",
+  "size": "S",
+  "scope": "Demo",
+  "depends": [
+   "T8.1",
+   "T8.2",
+   "T8.3"
+  ],
+  "description": "Read-only transcript view for the just-finished session: every question, attempt, hint event, effort signal values, and the decision with its justification."
+ },
+ {
+  "id": "T8.5",
+  "title": "Copilot pilot build evaluation",
+  "epic": 8,
+  "epic_title": "Pilot web PoC",
+  "status": "not_started",
+  "size": "S",
+  "scope": "Demo",
+  "depends": [
+   "T8.1",
+   "T8.2",
+   "T8.3",
+   "T8.4"
+  ],
+  "description": "Hand the pilot spec (HLD Pilot section + T8.1-T8.4) to the Copilot coding agent as a build issue, then grade the delivered build on correctness, completeness, and code quality. Record a go/no-go note on delegating 10-day build work to the agent."
  }
 ]

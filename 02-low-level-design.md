@@ -758,6 +758,20 @@ The demo is built to run the full challenge-to-unlock flow end to end. One compo
 
 Nothing else is simulated. In particular, question verification, effort scoring, and decision logging in the demo are the production designs in Sections 3, 5, and 10, not demo shortcuts.
 
+## 14.1 Pilot web PoC --- module mapping \[LLD-pilot-web-poc-module-mapping\]
+
+The pilot is a web page, not the iOS app. Its pieces stand in for LLD modules as follows --- simplified, and throwaway:
+
+- Pilot question engine ≈ TutorEngine (question selection and the hint ladder only; no TTS, no model).
+
+- Pilot scorer ≈ EffortScorer, deterministic subset: active time (idle-paused), attempts, revisions, hint interactions; the Section 3.3 floor rule and a variable threshold. No AI judge, no grade-aware weights, no StallingDetector.
+
+- Pilot transcript view ≈ TranscriptViewer (read-only, single session).
+
+- No ShieldManager, no PolicyStore, no SyncService, no ModelRuntime, no DecisionLogger / AuditorEngine --- the pilot writes its one-paragraph justification inline instead of logging a Decision.
+
+Nothing from the pilot is reused in the iOS build. The pilot validates the loop; the demo implements the production designs in Sections 3, 5, and 10.
+
 # 15. CI/CD pipeline \[LLD-ci-cd-pipeline\]
 
 CI/CD is build-time infrastructure, not an app module. The module map in Section 1 is unchanged: no CI/CD module is added to either app, and nothing in this section changes any module's inputs, outputs, or stored state.

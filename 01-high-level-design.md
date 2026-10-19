@@ -450,6 +450,30 @@ Four demo moments carry the argument, and the demo is built so each one can be s
 
 - **CI pipeline --- Demo scope:** Set up during the demo build so every push builds, tests, archives, and uploads to TestFlight automatically (see Section 11).
 
+## Pilot --- web proof of concept \[HLD-pilot-web-proof-of-concept\]
+
+A quick web-based proof of concept of the core tutor loop, built and evaluated before day one of the 10-day iOS build. It has two jobs: validate the interaction design with a real child before the iOS build commits to it, and test how well a coding agent (Copilot) builds from our spec --- a small, well-specified feature is the cheapest way to calibrate how much of the 10-day build can be delegated.
+
+What the pilot builds: a single web page (plain HTML/JS, no backend, no build step) implementing one full challenge cycle:
+
+- 12 varied-form 4th-grade math questions --- stories, reverse problems, estimation, \'which one is wrong and why\'. The Section 5 \'not in normal form\' rule applies; no plain textbook drills.
+
+- The 3-level hint ladder (nudge → strategy → one worked step).
+
+- Deterministic effort scoring: active time (idle-paused after \~20 seconds), attempts, revisions, hint interactions --- against the floor rule (at least one genuine attempt + one real hint/follow-up interaction) and a variable per-session threshold.
+
+- An unlock decision with a one-paragraph justification, and a simulated unlock screen (\'YouTube unlocked for 30 minutes\' --- a mock, no real locking).
+
+- An admin transcript view: every question, attempt, hint event, effort signal, and the decision with its justification.
+
+Explicitly NOT in the pilot: iOS, FamilyControls / ManagedSettings shields, the on-device model, AI-judged effort (deterministic subset only), stalling-vs-trying AI probes, movement / chore trades, Bluetooth sync, read-aloud. The \'unlock\' is a mock screen.
+
+Success criteria: (1) a child who tries hard earns the simulated unlock despite wrong answers; a child who idles or guesses earns nothing --- the same effort-over-perfection claim as the demo, on the web first. (2) The build is produced by the coding agent from this section plus Epic 8, and graded on correctness, completeness, and code quality (T8.5).
+
+Throwaway code: nothing from the pilot ships in the iOS app. It validates the interaction design and the agent workflow, then it is done. How its pieces map to the LLD modules is stated in LLD Section 14.1.
+
+Sequencing: pre-kickoff validation, sequenced before Epic 0. It informs the demo; it is not a submission gate, but it is Demo scope and part of the 38-task definition of done.
+
 ## Version 1 \[HLD-version-1\]
 
 Version 1 is the full product described in Sections 2--8: all six flows complete, including AI-initiated movement trades with motion verification, chore trades including the asynchronous photo-proof mode, the complete auditor flag set over real usage history, the full decision log and transcript review, and offline enforcement over extended periods without sync. Content coverage, caps, and tuning reach their intended breadth, and the distribution entitlement and App Store review are completed for a real release. App Store submission is v1 scope.

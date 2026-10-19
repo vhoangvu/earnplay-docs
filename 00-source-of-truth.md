@@ -140,6 +140,8 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 
 ## 11. Canonical facts --- Scope \[SSOT-canonical-facts-scope\]
 
+- **Pilot (pre-kickoff, Demo scope):** a quick web-based proof of concept of the core tutor loop --- varied-form challenge questions, the 3-level hint ladder, deterministic effort scoring with the floor rule, a simulated unlock with justification, and an admin transcript view. Two jobs: validate the interaction design with a real child before the iOS build, and test coding-agent (Copilot) build performance on a small, well-specified feature. Web-only: no iOS, no FamilyControls/shields, no on-device model, no AI effort judgment, no trades, no sync. Throwaway code --- nothing from the pilot ships in the iOS app.
+
 - **10-day demo:** child app (diagnostic + challenge questions + shield on 1--2 apps + pass → timed unlock → re-lock) + admin app (pick unblockable apps, set question count / pass bar / unlock duration, see progress --- synced over Bluetooth). Demo moments: hard-trying child earns unlock despite wrong answers; idling child earns nothing; three ways to earn one unlock (practice / movement / chore); auditor catches a staged leniency error. CI pipeline (build/test/archive/TestFlight upload automation) is Demo scope.
 
 - **v1:** full flows (including photo-proof async mode, App Store submission).
@@ -173,35 +175,37 @@ Which derived docs mirror which sections of this document.
   ------------------------------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------
   **Hackathon Application Draft**                         Identity, Product idea (Locking + Effort + Trades + Audit), Assurance, Technical approach, Demo plan, Roadmap (Scope Future)
 
-  **High-Level Design**                                   Identity, Locking, Effort, Questions, Trades, Audit, Assurance, Privacy, Platform, Scope
+  **High-Level Design**                                   Identity, Locking, Effort, Questions, Trades, Audit, Assurance, Privacy, Platform, Scope, Pilot
 
   **High-Level Design --- UX design \[HLD-ux-design\]**   HLD-only detail: screen inventory, key screen descriptions, kids-UX principles, accessibility (no SSOT canonical fact; no LLD/tasks changes)
 
-  **Low-Level Design**                                    Locking, Effort, Questions, Trades, Audit, Assurance, Privacy, Platform, Scope (demo mapping)
+  **Low-Level Design**                                    Locking, Effort, Questions, Trades, Audit, Assurance, Privacy, Platform, Scope (demo mapping), Pilot (§14.1 module mapping)
 
-  **Build Task Breakdown**                                Scope (Demo/v1/Future tags), Effort numbers, Trade caps, Audit checks, Assurance layers
+  **Build Task Breakdown**                                Scope (Demo/v1/Future tags), Effort numbers, Trade caps, Audit checks, Assurance layers, Pilot (Epic 8)
 
   **Entitlement Justification**                           Identity (app overview), Platform (APIs), Privacy, Audit/safety (child safety)
   ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## 14. Changelog \[SSOT-changelog\]
 
-  ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **Date**                **Change**                                                                                                                                 **Docs updated**
-  ----------------------- ------------------------------------------------------------------------------------------------------------------------------------------ --------------------------
-  2026-10-17              Created from the five existing docs. No fact changes.                                                                                      ---
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  **Date**                **Change**                                                                                                                                                                                                                    **Docs updated**
+  ----------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------
+  2026-10-17              Created from the five existing docs. No fact changes.                                                                                                                                                                         ---
 
-  2026-10-17              Shield exemption question resolved-as-default: enumeration-first architecture; prototype demoted to confirmation-only.                     HLD, LLD, Task Breakdown
+  2026-10-17              Shield exemption question resolved-as-default: enumeration-first architecture; prototype demoted to confirmation-only.                                                                                                        HLD, LLD, Task Breakdown
 
-  2026-10-17              CI/CD and release facts added (Epic 7 tasks; HLD/LLD updated).                                                                             HLD, LLD
+  2026-10-17              CI/CD and release facts added (Epic 7 tasks; HLD/LLD updated).                                                                                                                                                                HLD, LLD
 
-  2026-10-18              HLD gained a UX design section (screen inventory, key screens, kids-UX principles, accessibility); SSOT doc map updated.                   SSOT, HLD
+  2026-10-18              HLD gained a UX design section (screen inventory, key screens, kids-UX principles, accessibility); SSOT doc map updated.                                                                                                      SSOT, HLD
 
-  2026-10-18              Grade made a data-model parameter (demo stays 4th grade); SSOT canonical fact added.                                                       SSOT
+  2026-10-18              Grade made a data-model parameter (demo stays 4th grade); SSOT canonical fact added.                                                                                                                                          SSOT
 
-  2026-10-18              Product target widened to grades 1--5 with grade-adaptive UX bands; HLD UX section updated; demo stays 4th grade.                          SSOT, HLD
+  2026-10-18              Product target widened to grades 1--5 with grade-adaptive UX bands; HLD UX section updated; demo stays 4th grade.                                                                                                             SSOT, HLD
 
-  2026-10-18              Sync rule gained an impact-tracing step (checker catches drift, not completeness) after grade-band propagation missed LLD/tasks updates.   SSOT
+  2026-10-18              Sync rule gained an impact-tracing step (checker catches drift, not completeness) after grade-band propagation missed LLD/tasks updates.                                                                                      SSOT
 
-  2026-10-18              T0.4 re-labeled v1-blocking (demo uses simulated-shield fallback); no Apple account or entitlement needed for the Nov 4 demo.              SSOT
-  ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  2026-10-18              T0.4 re-labeled v1-blocking (demo uses simulated-shield fallback); no Apple account or entitlement needed for the Nov 4 demo.                                                                                                 SSOT
+
+  2026-10-18              Pilot section added: web PoC of the core tutor loop (validates the interaction design + tests Copilot build performance); HLD §10, LLD §14.1, Epic 8 (T8.1--T8.5, Demo scope); 49 tasks, 38 in the demo definition of done.   SSOT, HLD, LLD, Task Breakdown
+  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
