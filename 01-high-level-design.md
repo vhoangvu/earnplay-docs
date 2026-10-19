@@ -486,9 +486,11 @@ What the pilot builds: a single web page (plain HTML/JS, no backend, no build st
 
 - An unlock decision with a one-paragraph justification, and a simulated unlock screen (\'YouTube unlocked for 30 minutes\' --- a mock, no real locking).
 
-- An admin transcript view: every question, attempt, hint event, effort signal, and the decision with its justification.
+- An admin transcript view: every question, attempt, hint event, effort signal, and the decision with its justification --- plus the parallel AI effort judge's verdict shown beside the deterministic scorer's, with disagreements flagged.
 
-Explicitly NOT in the pilot: iOS, FamilyControls / ManagedSettings shields, the on-device model, AI-judged effort (deterministic subset only), stalling-vs-trying AI probes, movement / chore trades, Bluetooth sync, read-aloud. The \'unlock\' is a mock screen.
+- An in-browser model (WebLLM via CDN, no build step --- the pilot stays plain HTML/JS) running a small instruction-tuned open-weights model, lazy-loaded on first user gesture with download progress: it drafts tutor messages (encouragement, probes, hint wording within the ladder level the code chose) and judges effort in parallel with the deterministic scorer. Advisory only: the scorer still gates the unlock; every draft is validated (length cap, never contains the final answer --- checked against the solver-verified answer; bounded regeneration, then fallback to the canned line). If WebGPU is unavailable or the model fails to load, the pilot works exactly as the deterministic-only version.
+
+Explicitly NOT in the pilot: iOS, FamilyControls / ManagedSettings shields, movement / chore trades, Bluetooth sync, read-aloud. The \'unlock\' is a mock screen. (The in-browser model stands in for the on-device ModelRuntime; it never decides unlocks.)
 
 Success criteria: (1) a child who tries hard earns the simulated unlock despite wrong answers; a child who idles or guesses earns nothing --- the same effort-over-perfection claim as the demo, on the web first. (2) The build is produced by the coding agent from this section plus Epic 8, and graded on correctness, completeness, and code quality (T8.5).
 

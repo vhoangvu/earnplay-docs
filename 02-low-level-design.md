@@ -762,13 +762,13 @@ Nothing else is simulated. In particular, question verification, effort scoring,
 
 The pilot is a web page, not the iOS app. Its pieces stand in for LLD modules as follows --- simplified, and throwaway:
 
-- Pilot question engine ≈ TutorEngine (question selection and the hint ladder only; no TTS, no model).
+- Pilot question engine ≈ TutorEngine (question selection and the hint ladder only; no TTS) plus a browser-model drafter (WebLLM, small open-weights) that words tutor messages --- encouragement, probes, hint text within the code-chosen ladder level; every draft validated, fallback to canned lines.
 
-- Pilot scorer ≈ EffortScorer, deterministic subset: active time (idle-paused), attempts, revisions, hint interactions; the Section 3.3 floor rule and a variable threshold. No AI judge, no grade-aware weights, no StallingDetector.
+- Pilot scorer ≈ EffortScorer, deterministic subset: active time (idle-paused), attempts, revisions, hint interactions; the Section 3.3 floor rule and a variable threshold. The deterministic verdict still gates the unlock; a parallel browser-model judge scores the transcript alongside it --- advisory only, shown beside the scorer's verdict with disagreements flagged. No grade-aware weights, no StallingDetector.
 
-- Pilot transcript view ≈ TranscriptViewer (read-only, single session).
+- Pilot transcript view ≈ TranscriptViewer (read-only, single session), extended with the model's judge verdict panel.
 
-- No ShieldManager, no PolicyStore, no SyncService, no ModelRuntime, no DecisionLogger / AuditorEngine --- the pilot writes its one-paragraph justification inline instead of logging a Decision.
+- No ShieldManager, no PolicyStore, no SyncService, no DecisionLogger / AuditorEngine --- the pilot writes its one-paragraph justification inline instead of logging a Decision. (The browser model stands in for ModelRuntime in the pilot only.)
 
 Nothing from the pilot is reused in the iOS build. The pilot validates the loop; the demo implements the production designs in Sections 3, 5, and 10.
 

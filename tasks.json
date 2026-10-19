@@ -444,7 +444,8 @@
    "T8.2",
    "T8.3",
    "T8.4",
-   "T8.5"
+   "T8.5",
+   "T1.8"
   ],
   "description": "Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies — practice, movement, and chore; (4) the auditor catches a staged leniency error."
  },
@@ -571,7 +572,8 @@
    "T1.7",
    "T1.1",
    "T1.2",
-   "T1.3"
+   "T1.3",
+   "T1.8"
   ],
   "description": "Build the Band A (grades 1–2) variants of the three Demo screens — Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) — selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the scr"
  },
@@ -724,5 +726,18 @@
    "T8.4"
   ],
   "description": "Hand the pilot spec (HLD Pilot section + T8.1-T8.4) to the Copilot coding agent as a build issue, then grade the delivered build on correctness, completeness, and code quality. Record a go/no-go note on delegating 10-day build work to the agent."
+ },
+ {
+  "id": "T8.6",
+  "title": "Browser model: tutor messages + parallel effort judge",
+  "epic": 8,
+  "epic_title": "Pilot web PoC",
+  "status": "not_started",
+  "size": "M",
+  "scope": "Demo",
+  "depends": [
+   "T8.4"
+  ],
+  "description": "Give the pilot an in-browser model (WebLLM via CDN, no build step) with two jobs: (1) draft tutor messages (encouragement, probes, hint wording) within the ladder level the deterministic code chose; (2) judge effort in parallel with the deterministic scorer, advisory only — the scorer still gates the unlock; both verdicts shown side by side, disagreements flagged. Guardrails in code: every draft validated (length cap, never contains the final answer; bounded regeneration then canned fallback); no model output can change the unlock decision. Lazy-loads on user gesture; if WebGPU is unavailable or the model fails, the pilot works exactly as the deterministic-only version."
  }
 ]
