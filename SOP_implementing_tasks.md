@@ -79,12 +79,10 @@ If you cannot proceed — missing dependency, ambiguous spec, environment failur
 A task whose dependency is Blocked is itself Blocked. Say so; do not skip the
 dependency.
 
-## 8. Verification (maintainer)
+## 8. Verification
 
-1. Re-run the automated test.
-2. Spot-check the manual steps.
-3. Confirm every acceptance criterion.
-4. Mark the task Done (dashboard / `tasks.json`).
+Verification is a separate SOP: `SOP_reviewing_tasks.md`. Do not mark your own task
+Done — the reviewer does that after the review passes.
 
 ## 9. Troubleshooting
 
