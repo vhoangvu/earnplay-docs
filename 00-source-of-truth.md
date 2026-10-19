@@ -147,6 +147,7 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 - **Pilot:** plain HTML/JS, no build step, no backend.
 - **Source layout (iOS code repo, when created):** `EarnPlay/` (child app target), `EarnPlayAdmin/` (admin app target), `EarnPlayCore/` (shared Swift package: models, schemas, solver), `EarnPlayTests/` (test targets).
 - **Source layout (pilot, in this repo):** `pilot/` --- single page (`index.html`, `app.js`, `questions.js`), no build step; the Copilot agent builds it here because the build issue lives in this repo.
+- **Design system (canonical):** color palette — Primary #4361EE, Secondary #FFB703, Background #F7F8FC, Surface #FFFFFF, Text #1B1B2F, Text-secondary #6C6C80, Success #2EC4B6, Warning #FF9F1C, Error #E71D36. Typography — iOS SF Pro / pilot system-ui stack; Title 28 bold, Headline 20 semibold, Body 17, Caption 13 (Band A grades 1–2 uses one step larger minimums). Spacing scale 4/8/12/16/24/32; corner radius 14 cards, 10 buttons. Core components: PrimaryButton, SecondaryButton, QuestionCard, HintButton, ProgressBar, UnlockBanner, ShieldView, StatCard. Single theme source — iOS: `DesignSystem` in EarnPlayCore (no hardcoded colors/fonts outside it); pilot: CSS custom properties in `:root` (no hardcoded hex outside). Color is never the only signal (per accessibility).
 
 ## 11. Canonical facts --- Scope \[SSOT-canonical-facts-scope\]
 
@@ -222,4 +223,6 @@ Which derived docs mirror which sections of this document.
   2026-10-18              Tech stack section added: Swift + SwiftUI picked over UIKit (build speed, FamilyActivityPicker is SwiftUI-native, concise for agents); Xcode workspace + shared Swift package; Apple frameworks; quantized on-device model; CI options; pilot plain HTML/JS.                                                                                  SSOT
 
   2026-10-18              Source layout defined: iOS code repo (EarnPlay/, EarnPlayAdmin/, EarnPlayCore/, EarnPlayTests/); pilot at pilot/ in this repo (index.html, app.js, questions.js).                                                                                                                                               SSOT
+
+  2026-10-19              Design system added (canonical palette hex values, typography, spacing, core components, single-theme-source rule); HLD gained a Design system usage section. Keeps UI code consistent across parallel agents/threads.                                                                                                                    SSOT, HLD
   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

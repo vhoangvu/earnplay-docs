@@ -312,6 +312,26 @@ Accessibility is part of the definition of done for every screen in both apps, n
 
 - **Reduce Motion.** When the system Reduce Motion setting is on, celebration and transition animations are replaced with static state changes; no information is carried by movement, and the countdown\'s meter still reads correctly without animating.
 
+## Design system \[HLD-design-system\]
+
+One shared visual language for both apps and the pilot, so UI code stays consistent no matter how many agents or threads build screens in parallel. The palette and tokens in the Source of Truth are canonical; this section is the usage spec.
+
+**Color usage.** Primary #4361EE is the action color: buttons that move the session forward (start challenge, submit answer, unlock). Secondary #FFB703 marks highlights and secondary actions (hint button, streaks). Background #F7F8FC everywhere; Surface #FFFFFF for cards. Text #1B1B2F for content, #6C6C80 for secondary labels. Success #2EC4B6 confirms (correct answer, unlock granted); Warning #FF9F1C cautions (low time, trade offer); Error #E71D36 blocks (wrong answer feedback, shield). The shield screen uses Text-secondary grays plus a lock icon and words --- never color alone.
+
+**Typography and spacing.** iOS uses SF Pro, the pilot uses the system-ui stack. Title 28 bold for screen titles, Headline 20 semibold for card titles, Body 17 for questions and content, Caption 13 for labels and metadata. Band A (grades 1--2) uses one step larger minimums and never below Body 17 for anything the child must read. Spacing scale is 4/8/12/16/24/32; cards use 16 padding, screens 16 margins. Corner radius 14 for cards, 10 for buttons --- rounded and friendly, never sharp.
+
+**Core components.** Every screen is built from these; do not invent new visual styles:
+- **PrimaryButton** --- Primary fill, white text, radius 10, full-width on child screens.
+- **SecondaryButton** --- Secondary fill or outline, for hints and alternatives.
+- **QuestionCard** --- Surface card, radius 14, Headline question text, generous padding.
+- **HintButton** --- Secondary, with a lightbulb icon plus the word "Hint".
+- **ProgressBar** --- track Background-dark, fill Primary, with a text label ("3 of 12").
+- **UnlockBanner** --- Success fill, celebration copy, what unlocked and for how long.
+- **ShieldView** --- gray, lock icon, plain words saying the app is locked and how time is earned.
+- **StatCard** (admin) --- Surface card with a labeled number plus a small chart or shape; color always paired with a label.
+
+**Code structure rule.** There is exactly one theme source per codebase. iOS: a `DesignSystem` definition in EarnPlayCore exposing Colors, Fonts, and Spacing for SwiftUI; no hardcoded colors, font sizes, or spacing values anywhere else. Pilot: CSS custom properties in `:root`; no hardcoded hex values anywhere else. A reviewer rejects any hardcoded visual value outside the theme source. Both apps import the same tokens, so a palette change lands everywhere at once.
+
 # 6 Data overview \[HLD-data-overview\]
 
 EarnPlay holds a small set of entity types, all stored on-device. This section names each entity and its purpose only; fields, types, and storage layout belong in the LLD.
