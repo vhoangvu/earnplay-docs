@@ -53,6 +53,8 @@
   #hints p { background-color: var(--color-secondary); color: var(--color-text); padding: var(--space-8); border-radius: var(--radius-button); }
   [data-component="unlock-banner"].unlocked { background-color: var(--color-success); } [data-component="unlock-banner"].locked { background-color: var(--color-background); }
   [data-component="unlock-banner"] { color: var(--color-text); padding: var(--space-16); border-radius: var(--radius-card); }
+  .judge-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-8); padding: var(--space-12); border-radius: var(--radius-card); background-color: var(--color-surface); }
+  .judge-panel.disagreement { border-left: var(--border-width) solid var(--color-warning); }
   table { border-collapse: collapse; width: var(--size-full); font-size: var(--font-size-caption); }
   td, th { border: var(--border-width) solid var(--color-text-secondary); padding: var(--space-4); vertical-align: top; text-align: left; }
   .note { color: var(--color-text-secondary); font-size: var(--font-size-caption); }
@@ -84,6 +86,10 @@
     <button type="button" id="finish-btn">Finish session</button>
   </div>
   <div id="hints"></div>
+  <div>
+    <button type="button" id="enable-model-btn">Enable AI tutor</button>
+    <span id="ai-status" class="note" aria-live="polite">AI tutor is off. Your session works without it.</span>
+  </div>
 </main>
 
 <main id="screen-decision" hidden>
@@ -105,6 +111,11 @@
   </table>
   <h2>Effort signals</h2>
   <p id="transcript-signals"></p>
+  <h2>Effort judge (advisory)</h2>
+  <div id="judge-panel" class="judge-panel">
+    <p id="judge-scorer">Scorer: —</p>
+    <p id="judge-model">Model judge: unavailable</p>
+  </div>
   <h2>Decision</h2>
   <p id="transcript-decision"></p>
   <button type="button" id="back-btn">Back</button>
@@ -113,5 +124,26 @@
 
 <script src="questions.js"></script>
 <script src="app.js"></script>
+<script type="module">
+  window.EarnPlayModel = {
+    engine: null,
+    async load(onProgress) {
+      if (!navigator.gpu) throw new Error('WebGPU is unavailable');
+      const webllm = await import('https://esm.run/@mlc-ai/web-llm');
+      const model = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
+      this.engine = await webllm.CreateMLCEngine(model, {
+        initProgressCallback: (state) => onProgress(state)
+      });
+    },
+    async generate(prompt, jsonMode) {
+      const response = await this.engine.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        max_tokens: jsonMode ? 160 : 120
+      });
+      return response.choices[0].message.content;
+    }
+  };
+</script>
 </body>
 </html>

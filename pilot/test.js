@@ -4,8 +4,16 @@ const QUESTIONS = require('./questions.js');
 const A = require('./app.js');
 
 let failures = 0;
+const pendingTests = [];
 function test(name, fn) {
-  try { fn(); console.log('PASS ' + name); } catch (err) { failures++; console.log('FAIL ' + name + ': ' + err.message); }
+  try {
+    const result = fn();
+    if (result && typeof result.then === 'function') {
+      pendingTests.push(result.then(() => console.log('PASS ' + name)).catch((err) => {
+        failures++; console.log('FAIL ' + name + ': ' + err.message);
+      }));
+    } else console.log('PASS ' + name);
+  } catch (err) { failures++; console.log('FAIL ' + name + ': ' + err.message); }
 }
 
 // T8.2: every stored answer matches an independent recomputation, 12/12.
@@ -119,5 +127,33 @@ test('parseAnswer', () => {
   assert.strictEqual(A.parseAnswer(''), null);
 });
 
-console.log(failures ? failures + ' FAILED' : 'ALL PASSED');
-process.exit(failures ? 1 : 0);
+test('T8.6 rejects answer-leaking tutor drafts and falls back to the canned line', async () => {
+  let attempts = 0;
+  const fallback = 'Try splitting the problem into steps.';
+  const message = await A.draftTutorMessage(async () => {
+    attempts++;
+    return 'The answer is 86.';
+  }, 'Tutor prompt', 86, fallback);
+  assert.strictEqual(message, fallback);
+  assert.strictEqual(attempts, 3);
+});
+
+test('T8.6 scorer controls unlock when the model judge disagrees in both directions', () => {
+  const unlocked = A.compareJudge({ unlock: true }, { verdict: 'stalling' });
+  const locked = A.compareJudge({ unlock: false }, { verdict: 'trying' });
+  assert.strictEqual(unlocked.unlock, true);
+  assert.strictEqual(unlocked.disagreement, true);
+  assert.strictEqual(locked.unlock, false);
+  assert.strictEqual(locked.disagreement, true);
+});
+
+test('T8.6 parses judge JSON defensively', () => {
+  assert.deepStrictEqual(A.parseJudgeResponse('```json\n{"verdict":"trying","justification":"Kept working."}\n```'),
+    { verdict: 'trying', justification: 'Kept working.' });
+  assert.strictEqual(A.parseJudgeResponse('not JSON'), null);
+});
+
+Promise.all(pendingTests).then(() => {
+  console.log(failures ? failures + ' FAILED' : 'ALL PASSED');
+  process.exit(failures ? 1 : 0);
+});
