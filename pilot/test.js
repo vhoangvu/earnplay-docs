@@ -150,8 +150,10 @@ test('T8.6 scorer controls unlock when the model judge disagrees in both directi
   const unlocked = A.compareJudge({ unlock: true }, { verdict: 'stalling' });
   const locked = A.compareJudge({ unlock: false }, { verdict: 'trying' });
   assert.strictEqual(unlocked.unlock, true);
+  assert.strictEqual(unlocked.judgeVerdict, 'stalling');
   assert.strictEqual(unlocked.disagreement, true);
   assert.strictEqual(locked.unlock, false);
+  assert.strictEqual(locked.judgeVerdict, 'trying');
   assert.strictEqual(locked.disagreement, true);
 });
 

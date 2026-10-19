@@ -419,7 +419,7 @@ if (typeof document !== 'undefined') {
       $('judge-scorer').textContent = 'Scorer: ' + (owner.result.unlock ? 'trying' : 'stalling') +
         ' (unlock gate)';
       $('judge-model').textContent = judge && judge.pending ? 'Model judge: checking…' :
-        judge && judge.verdict ? 'Model judge: ' + judge.verdict + ' — ' + judge.justification :
+        judge && judge.judgeVerdict ? 'Model judge: ' + judge.judgeVerdict + ' — ' + judge.justification :
         'Model judge: judge unavailable (AI tutor was not enabled or could not respond).';
       panel.className = 'judge-panel' + (judge && judge.disagreement ? ' disagreement' : '');
     }
