@@ -3,6 +3,11 @@
 You are building EarnPlay, a private on-device iOS tutor + app gate for kids
 (grades 1–5 target; demo ships 4th-grade content only).
 
+## Source of truth
+
+The `.md` files at the repo root are the source of truth. `source-docx/`
+holds the original Word files — read-only, never edit them.
+
 ## Document hierarchy
 
 1. `00-source-of-truth.md` — canonical facts. Where any doc disagrees, this wins.
@@ -28,3 +33,5 @@ You are building EarnPlay, a private on-device iOS tutor + app gate for kids
   safety-critical decision. Every math answer is solver-verified.
 - Do not invent facts. If a doc is ambiguous, the Source of Truth decides;
   if it is silent, ask before inventing.
+- Doc updates follow `SOP_updating_docs.md`: impact tracing in writing,
+  SSOT first, propagate, `check_md_pack.py` until green, changelog entry.
