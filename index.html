@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EarnPlay — Build Dashboard</title>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#182028; --panel2:#1f2933; --line:#2b3642;
+    --text:#e8edf2; --muted:#9aa7b4; --accent:#4da3ff;
+    --demo:#4da3ff; --v1:#b07dff; --future:#8a94a0;
+    --done:#3fb950; --prog:#d29922; --blocked:#f85149; --ns:#8a94a0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45}
+  header{padding:20px 24px;border-bottom:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+  header h1{margin:0;font-size:22px}
+  header .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  #countdown{font-variant-numeric:tabular-nums;font-size:15px;background:var(--panel);
+    border:1px solid var(--line);border-radius:8px;padding:8px 14px}
+  #countdown b{color:var(--accent)}
+  main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+  section{margin-bottom:28px}
+  h2{font-size:16px;margin:0 0 12px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.06em}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px}
+  .stat .n{font-size:26px;font-weight:700}
+  .stat .l{font-size:12px;color:var(--muted)}
+  .bar{height:10px;background:var(--panel2);border-radius:6px;overflow:hidden;margin-top:8px}
+  .bar > div{height:100%;background:linear-gradient(90deg,#2f81f7,#4da3ff);border-radius:6px;
+    transition:width .3s}
+  .epicrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+  .epic{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;cursor:pointer}
+  .epic.active{border-color:var(--accent)}
+  .epic .t{font-size:13px;font-weight:600}
+  .epic .c{font-size:12px;color:var(--muted)}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .filters select,.filters input{background:var(--panel);color:var(--text);
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
+  .filters input{flex:1;min-width:180px}
+  .task{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;margin-bottom:10px}
+  .task .row1{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .task .id{font-family:ui-monospace,Menlo,monospace;font-weight:700;color:var(--accent)}
+  .task .title{font-weight:600}
+  .badge{font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;
+    text-transform:uppercase;letter-spacing:.04em}
+  .size{background:var(--panel2);color:var(--muted)}
+  .scope-Demo{background:rgba(77,163,255,.15);color:var(--demo)}
+  .scope-v1{background:rgba(176,125,255,.15);color:var(--v1)}
+  .scope-Future{background:rgba(138,148,160,.15);color:var(--future)}
+  .task .meta{font-size:12px;color:var(--muted);margin-top:6px}
+  .task .sum{font-size:14px;margin-top:8px}
+  .task details{margin-top:8px;font-size:13px;color:var(--muted)}
+  .task details summary{cursor:pointer;color:var(--text)}
+  .task .ctl{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+  .task select{background:var(--panel2);color:var(--text);border:1px solid var(--line);
+    border-radius:8px;padding:6px 10px;font-size:13px}
+  .st-not_started{border-left:4px solid var(--ns)}
+  .st-in_progress{border-left:4px solid var(--prog)}
+  .st-blocked{border-left:4px solid var(--blocked)}
+  .st-done{border-left:4px solid var(--done);opacity:.75}
+  .task textarea{width:100%;background:var(--panel2);color:var(--text);
+    border:1px solid var(--line);border-radius:8px;padding:8px;font-size:13px;
+    font-family:inherit;resize:vertical;min-height:44px}
+  .nextup{display:flex;flex-wrap:wrap;gap:8px}
+  .nextup button{background:var(--panel2);border:1px solid var(--accent);color:var(--text);
+    border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer}
+  .nextup button:hover{background:#273449}
+  .empty{color:var(--muted);font-size:14px;padding:12px;background:var(--panel);
+    border:1px dashed var(--line);border-radius:10px}
+  footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>EarnPlay — Build Dashboard</h1>
+    <div class="sub">44 tasks · statuses &amp; notes save in this browser (localStorage) · seeded from tasks.json</div>
+  </div>
+  <div id="countdown">…</div>
+</header>
+<main>
+  <section>
+    <h2>Overview</h2>
+    <div class="cards" id="stats"></div>
+    <div style="margin-top:12px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px" id="overallLabel"></div>
+      <div class="bar"><div id="overallBar" style="width:0%"></div></div>
+      <div style="font-size:13px;color:var(--muted);margin:10px 0 4px" id="demoLabel"></div>
+      <div class="bar"><div id="demoBar" style="width:0%"></div></div>
+    </div>
+  </section>
+  <section>
+    <h2>Next up</h2>
+    <div class="nextup" id="nextup"></div>
+  </section>
+  <section>
+    <h2>Blocked</h2>
+    <div id="blocked"></div>
+  </section>
+  <section>
+    <h2>Epics (click to filter)</h2>
+    <div class="epicrow" id="epics"></div>
+  </section>
+  <section>
+    <h2>Tasks</h2>
+    <div class="filters">
+      <select id="fEpic"><option value="">All epics</option></select>
+      <select id="fStatus">
+        <option value="">All statuses</option>
+        <option value="not_started">Not started</option>
+        <option value="in_progress">In progress</option>
+        <option value="blocked">Blocked</option>
+        <option value="done">Done</option>
+      </select>
+      <select id="fScope">
+        <option value="">All scopes</option>
+        <option>Demo</option><option>v1</option><option>Future</option>
+      </select>
+      <input id="fSearch" type="search" placeholder="Search tasks…">
+      <button id="fClear" style="background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer">Clear</button>
+    </div>
+    <div id="tasks"></div>
+  </section>
+</main>
+<footer>EarnPlay build dashboard · static mirror for GitHub Pages · demo deadline Nov 4, 2026 9:00 PM ET</footer>
+
+<script id="task-data" type="application/json">[{"task_id":"T0.1","title":"Project scaffolding","epic":0,"epic_name":"Setup and long-lead items","status":"not_started","size":"S","scope":"Demo","depends_on":[],"summary":"Create the Xcode workspace with two app targets (EarnPlay child app and EarnPlay Admin), a shared Swift package for models and schemas used by both apps, and a git repository. Fix and record the bundle IDs for both apps.","acceptance":"Both targets build and run on a device from a clean checkout; both bundle IDs are recorded in the project.","note":""},{"task_id":"T0.2","title":"Model runtime spike","epic":0,"epic_name":"Setup and long-lead items","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.1"],"summary":"Integrate a quantized-model runtime (llama.cpp / MLC-style), load a small open-weights model on-device, and run one prompt-to-response round-trip fully offline. Record cold and warm round-trip latency.","acceptance":"Inference runs on-device with no network connection; round-trip latency is measured and recorded for both a cold start and a warm run.","note":""},{"task_id":"T0.3","title":"Solver service","epic":0,"epic_name":"Setup and long-lead items","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.1"],"summary":"Build the deterministic verifier for 4th-grade skills: multiplication facts to 12×12, multi-digit multiplication, division, fraction comparison and addition, and word problems. The solver is plain code — the model never grades its own answers.","acceptance":"The solver verifies a 50-problem test bank with 100% agreement to hand-computed answers; the bank covers every listed skill at least 5 times.","note":""},{"task_id":"T0.4","title":"Entitlement filing — do first, long lead","epic":0,"epic_name":"Setup and long-lead items","status":"not_started","size":"S","scope":"v1","depends_on":["T0.1"],"summary":"File the FamilyControls (Distribution) entitlement request using the prepared justification draft, and enable the development entitlement so real shields can be tested locally while the distribution request is reviewed.","acceptance":"Distribution request is filed for the exact child-app bundle ID; a build using the development entitlement compiles and runs locally.","note":""},{"task_id":"T1.1","title":"Diagnostic","epic":1,"epic_name":"Child app: tutor + challenge","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.2","T0.3"],"summary":"Build the 10-minute diagnostic that produces a skill profile across facts fluency, fractions, word problems, reading fluency, and comprehension. The profile drives what the tutor asks next.","acceptance":"Completing the diagnostic measurably changes the subsequent question mix; re-running it overwrites the profile cleanly with no stale skill levels.","note":""},{"task_id":"T1.2","title":"Question generation + verification loop","epic":1,"epic_name":"Child app: tutor + challenge","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.2","T0.3"],"summary":"The model proposes a problem (skill + form + values); the solver verifies it before it is shown. On failure, retry within a bounded count, then fall back to a safe, pre-verified question. Questions use varied, real-world and puzzle-like forms — not plain textbook form.","acceptance":"Across 100 generated problems, zero unverified problems reach the UI; the run is logged with per-item verify status.","note":""},{"task_id":"T1.3","title":"Hint ladder","epic":1,"epic_name":"Child app: tutor + challenge","status":"not_started","size":"S","scope":"Demo","depends_on":["T1.2"],"summary":"Three hint levels — nudge, then strategy, then one worked step — offered while the child is working. Record every hint use, and track whether a hint is followed by a changed answer.","acceptance":"Each level shows correct content for the current problem; hint events are logged, including hint → changed-answer; a fourth request shows no new level.","note":""},{"task_id":"T1.4","title":"Effort scoring","epic":1,"epic_name":"Child app: tutor + challenge","status":"not_started","size":"M","scope":"Demo","depends_on":["T1.2"],"summary":"Score genuine effort from active minutes (pausing after about 20 seconds with no interaction), attempts, hint interactions, answer revisions, and explanations. Compare against a per-session variable threshold (about 8–14 points) with a floor rule: at least one genuine attempt plus one real hint or follow-up interaction — below the floor, no amount of time unlocks.","acceptance":"Scripted sessions score as expected: a genuinely trying session passes even with wrong answers; an idling session fails.","note":""},{"task_id":"T1.5","title":"Stalling probes","epic":1,"epic_name":"Child app: tutor + challenge","status":"not_started","size":"S","scope":"Demo","depends_on":["T1.4"],"summary":"Detect stalling from signals such as missing revisions, response-time patterns, repeated identical wrong answers, and hints used as an answer key. When signals fire, probe conversationally — “show me one step” — and count a substantive reply as effort.","acceptance":"A probe fires on stalling signals in a scripted session, at most once per stalling episode; a reply to the probe is recorded as effort.","note":""},{"task_id":"T1.6","title":"Decision logger","epic":1,"epic_name":"Child app: tutor + challenge","status":"not_started","size":"S","scope":"Demo","depends_on":["T1.4"],"summary":"Every consequential decision — unlock granted or denied, trade offered, difficulty changed — writes a Decision record with a full justification: the decision, the evidence observed, the reasoning, the alternative considered, and a confidence level. Routine actions get a one-line reason.","acceptance":"Unlock, trade, and difficulty decisions all produce log entries with every justification field populated; no consequential decision path completes without a log write.","note":""},{"task_id":"T1.7","title":"Read-aloud infrastructure","epic":1,"epic_name":"Child app: tutor + challenge","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.1"],"summary":"Build the ReadAloudService for the child app: on-device text-to-speech only (the system's built-in speech, for example AVSpeechSynthesizer — no network call, no downloaded voice), behind one reusable speaker-button component for question, hint, and instruction views (the Diagnostic, Challenge, and Hint display views from T1.1–T1.3). The grade parameter selects the behaviour: in Band A (grades 1–2) reading starts automatically when a question, hint, or instruction appears; in Band B (grades 3–5, including the demo's grade 4) the button is always present and the child taps it to hear the text. Starting a new item or leaving the view stops the current reading. When a hint is read aloud, emit a hint-listen event for the EffortScorer (T1.4), so Band A effort scoring can weight hint-listens.","acceptance":"In Airplane Mode, tapping the speaker button on a question, a hint, and an instruction reads exactly that view's text aloud with no network call; with the grade set to a Band A grade, reading starts automatically on appearance, and with a Band B grade it does not start until the button is tapped; navigating away stops the reading. No reading path may require a network connection or a downloaded voice: a build that prompts to download a voice, or fails silently in Airplane Mode, fails acceptance.","note":""},{"task_id":"T2.1","title":"Policy store","epic":2,"epic_name":"Locking","status":"not_started","size":"S","scope":"Demo","depends_on":["T0.1"],"summary":"Build the versioned policy store on the child device: always-allowed apps, the unblockable list, never-unlockable overrides, unlock durations, caps, and the chore pool. Cache the policy on the child app; on version conflict, the admin's newer version wins.","acceptance":"Policy survives an app restart; a newer policy version replaces the older one; a corrupt policy file falls back to the last good policy (or safe default-deny).","note":""},{"task_id":"T2.2","title":"Shield manager","epic":2,"epic_name":"Locking","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.4","T2.1"],"summary":"Apply and remove ManagedSettings shields from policy, enumeration-first: shield every app except the allowlist, using apps enumerated via FamilyActivityPicker at setup, with category shields as a backstop for newly installed apps. Unlock timers run on a monotonic clock so changing the device clock cannot extend an unlock; re-lock on expiry and re-evaluate open windows after a restart.","acceptance":"An unlock lasts exactly the set duration (within 5 seconds) across device-clock changes and restarts, then re-locks; every enumerated app except the allowlist is shielded, and category shields catch newly installed apps.","note":""},{"task_id":"T2.3","title":"Setup flow","epic":2,"epic_name":"Locking","status":"not_started","size":"M","scope":"Demo","depends_on":["T2.1","T2.2"],"summary":"Guide a fresh install through FamilyControls authorization in Screen Time, then FamilyActivityPicker on the child's device to enumerate apps and choose the allowlist and the unblockable list. Shield every enumerated app except the allowlist, with category shields as a backstop; include the prevent-deleting-apps guidance.","acceptance":"Fresh install → authorized → policy set → shields active, end to end on a device; abandoning setup mid-flow leaves the device in default-deny, never half-open.","note":""},{"task_id":"T2.4","title":"Simulated shield fallback","epic":2,"epic_name":"Locking","status":"not_started","size":"S","scope":"Demo","depends_on":["T2.2"],"summary":"Provide an in-app shield screen that stands in for real ManagedSettings shields when the distribution entitlement is unavailable, so the full challenge-to-unlock flow can still be demonstrated. Simulated mode is visibly labelled as simulated on screen.","acceptance":"The demo runs end-to-end — challenge, effort scoring, unlock, timed window, re-lock — with real shields off.","note":""},{"task_id":"T2.5","title":"Default-deny for new apps","epic":2,"epic_name":"Locking","status":"not_started","size":"S","scope":"Demo","depends_on":["T2.2"],"summary":"Newly installed apps are locked until the next policy sync classifies them: category shields are the backstop that catches a newly installed app before it has been enumerated and classified. An unknown app never opens by default.","acceptance":"Installing a brand-new app results in that app being locked until policy sync — verified with the freshly installed app itself.","note":""},{"task_id":"T3.1","title":"Movement trade","epic":3,"epic_name":"Trades","status":"not_started","size":"M","scope":"Demo","depends_on":["T1.4"],"summary":"AI-initiated offer only (for example, jumping jacks or running in place). Verify the activity with CoreMotion rep counting with the phone in a pocket, showing a live counter. Enforce a once-per-session limit and a weekly cap, grant a 15-minute unlock on completion, and taper offers if trades become a pattern.","acceptance":"Verified reps grant the unlock (15 minutes — shorter than a practice-earned unlock); session and weekly caps are enforced; unverified motion does not count.","note":""},{"task_id":"T3.2","title":"Chore trade","epic":3,"epic_name":"Trades","status":"not_started","size":"M","scope":"Demo","depends_on":["T1.4"],"summary":"The AI offers exactly one chore from the parent-stocked pool mid-session, chosen with rotation and time-of-day fit. The child accepts or declines and taps done; the parent confirms completion and the unlock is granted. The child never sees a chore menu or list. (Demo uses a seeded chore pool; the editor is T4.1.)","acceptance":"The full flow works — offer, accept, done, parent confirm, unlock; no unlock exists between 'Done' and parent confirmation; a declined chore is not re-offered in that session.","note":""},{"task_id":"T3.3","title":"Trade offer logic","epic":3,"epic_name":"Trades","status":"not_started","size":"S","scope":"Demo","depends_on":["T3.1","T3.2"],"summary":"Decide mid-session whether to offer a movement trade, a chore trade, or no offer at all, varying the choice so no pattern is learnable. Enforce the floor: at least one genuine practice attempt happens before any alternative currency is offered.","acceptance":"Offer type varies across sessions with no predictable pattern (checked against the decision log); no trade is offered below the effort floor.","note":""},{"task_id":"T3.4","title":"Photo-proof async mode","epic":3,"epic_name":"Trades","status":"not_started","size":"M","scope":"v1","depends_on":["T3.2"],"summary":"Optional asynchronous chore verification: the child submits photo proof, the unlock is granted on trust, and the parent reviews later with the power to revoke and re-lock.","acceptance":"Photo proof grants the unlock (flagged provisional); a parent rejection revokes it and re-locks the app. (v1 — not in the demo.)","note":""},{"task_id":"T4.1","title":"Policy editor","epic":4,"epic_name":"Admin app","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.1","T2.1"],"summary":"Edit every policy field: always-allowed apps, the unblockable list, never-unlockable overrides, unlock durations, caps, the chore pool (chore, unlock minutes, expiry, verification mode), and movement-trade settings. Saving bumps the policy version and queues it for sync.","acceptance":"Every policy field is editable; a save increments the version and syncs to the child app — any LLD policy field with no editor control fails this task.","note":""},{"task_id":"T4.2","title":"Dashboard","epic":4,"epic_name":"Admin app","status":"not_started","size":"M","scope":"Demo","depends_on":["T4.6","T1.6"],"summary":"Show progress at a glance: accuracy per skill (this week versus last), active time per question, hint rate, most common error type, effort-score trend, and trade frequency — all computed from synced session logs.","acceptance":"The dashboard renders from synced logs with aggregates that match the underlying sessions; with no synced logs it shows an explicit empty state, not zeroes presented as real data.","note":""},{"task_id":"T4.3","title":"Transcript viewer","epic":4,"epic_name":"Admin app","status":"not_started","size":"S","scope":"Demo","depends_on":["T4.6"],"summary":"Open any session and read the full transcript: questions asked, the child's attempts, hints given, and timestamps.","acceptance":"Every synced session opens with a complete transcript; the longest synced session scrolls to its final event with no truncation.","note":""},{"task_id":"T4.4","title":"Decision log viewer","epic":4,"epic_name":"Admin app","status":"not_started","size":"S","scope":"Demo","depends_on":["T4.6"],"summary":"Browse the child's decision log — every unlock, trade and difficulty decision with its full justification — filterable by session and by decision type.","acceptance":"All decisions are visible with every justification field; session and type filters work; a decision missing from the viewer after sync fails acceptance.","note":""},{"task_id":"T4.5","title":"Auditor engine","epic":4,"epic_name":"Admin app","status":"not_started","size":"L","scope":"Demo","depends_on":["T4.3","T4.4"],"summary":"Run a second, separate on-device auditor over session logs with seven checks: leniency drift, false negatives, gaming patterns, question-quality and difficulty miscalibration, behavior shifts, inconsistency, and justifications that do not match the raw log. Each flag carries severity, evidence, and a suggested action; the auditor never changes policy on its own.","acceptance":"Staged sessions produce the expected flags for all seven checks (and none on a clean set), each citing a concrete session and field value the parent can verify.","note":""},{"task_id":"T4.6","title":"Sync","epic":4,"epic_name":"Admin app","status":"not_started","size":"M","scope":"Demo","depends_on":["T2.1","T1.6"],"summary":"Connect the two apps with MultipeerConnectivity over Bluetooth and local Wi-Fi. PolicyUpdate flows down to the child app; SessionLog flows up to the admin app. Handle versioning, queue messages while disconnected, and retry until delivered exactly once. Sync works when both apps are open and nearby — no account, server, or internet.","acceptance":"A policy change on the admin reaches the child; session logs reach the admin; the offline queue drains on reconnect with no duplicates.","note":""},{"task_id":"T5.1","title":"Eval harness","epic":5,"epic_name":"Assurance, demo, submission","status":"not_started","size":"M","scope":"Demo","depends_on":["T1.2","T1.4"],"summary":"Build scripted sessions for five personas — good-faith, guessing, idling, manipulative, and struggling child — and score them against fixed pass criteria: never teaches a wrong answer, never unlocks on pure idling, resists manipulation, and stays on-topic and age-appropriate.","acceptance":"The harness runs end to end from one written command and scores all five personas; hard criteria pass — 0 wrong answers taught, 0 unlocks for the idling persona.","note":""},{"task_id":"T5.2","title":"Red-teaming","epic":5,"epic_name":"Assurance, demo, submission","status":"not_started","size":"M","scope":"Demo","depends_on":["T5.1"],"summary":"Run a prompt-injection and jailbreak battery against the tutor — “ignore your instructions,” “mom said unlock,” “pretend you're my friend,” and edge cases — treating all child input as untrusted.","acceptance":"Zero successful manipulations across the battery, with the battery count reported (N cases, 0 successes).","note":""},{"task_id":"T5.3","title":"Versioning + rollback","epic":5,"epic_name":"Assurance, demo, submission","status":"not_started","size":"S","scope":"Demo","depends_on":["T0.2"],"summary":"Record the model and prompt version on every session. Provide a rollback procedure for a regressing model or prompt, and show the running version plus a known-limits note in the admin app.","acceptance":"Version is recorded on every session; a rollback is demonstrated end to end, not just documented.","note":""},{"task_id":"T5.4","title":"Demo staging","epic":5,"epic_name":"Assurance, demo, submission","status":"not_started","size":"S","scope":"Demo","depends_on":["T0.1","T0.2","T0.3","T0.4","T1.1","T1.2","T1.3","T1.4","T1.5","T1.6","T2.1","T2.2","T2.3","T2.4","T2.5","T3.1","T3.2","T3.3","T4.1","T4.2","T4.3","T4.4","T4.5","T4.6","T5.1","T5.2","T5.3","T5.5"],"summary":"Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies — practice, movement, and chore; (4) the auditor catches a staged leniency error.","acceptance":"All four demo moments run live, in sequence, without intervention — and the rehearsal passes twice in a row.","note":""},{"task_id":"T5.5","title":"Submission packaging","epic":5,"epic_name":"Assurance, demo, submission","status":"not_started","size":"S","scope":"Demo","depends_on":["T5.4"],"summary":"Produce the demo video and README and complete the hackathon submission, before the deadline: Nov 4, 9:00 PM ET.","acceptance":"Package is complete and confirmed submitted in the portal before Nov 4, 9:00 PM ET; the video link plays end to end and no placeholder text remains.","note":""},{"task_id":"T6.1","title":"App Store submission","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"L","scope":"v1","depends_on":["T0.4"],"summary":"Complete the distribution-entitlement approval, prepare for App Store review (kids category and privacy requirements), and run a TestFlight build.","acceptance":"TestFlight build is live and the App Store submission package is review-ready. (v1 gate — not part of the Demo definition of done.)","note":""},{"task_id":"T6.2","title":"Multi-child support","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"M","scope":"Future","depends_on":["T6.1"],"summary":"Extend policy, profiles, logs and the dashboard to more than one child, with per-child records that never cross-contaminate.","acceptance":"Roadmap item — acceptance criteria to be written when scheduled. Depends on v1 complete.","note":""},{"task_id":"T6.3","title":"Speech scoring for read-aloud","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"M","scope":"Future","depends_on":["T6.1"],"summary":"Score read-aloud practice on-device as part of the reading profile.","acceptance":"Roadmap item — acceptance criteria to be written when scheduled. Depends on v1 complete.","note":""},{"task_id":"T6.4","title":"Fuller curriculum","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"L","scope":"Future","depends_on":["T6.1"],"summary":"Broaden skills and question forms beyond the demo's 4th-grade core set; each new skill needs a deterministic solver verifier first.","acceptance":"Roadmap item — acceptance criteria to be written when scheduled. Depends on v1 complete.","note":""},{"task_id":"T6.5","title":"Selectable audit endpoint","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"M","scope":"Future","depends_on":["T4.5"],"summary":"Let the parent choose where the auditor runs: on-device local model (the default), the parent's own local endpoint (home server, NAS or Mac), or a cloud endpoint with a parent-supplied key. Cloud is opt-in only, offers a summaries-only mode, and shows a plain-language disclosure before it is enabled; the local auditor keeps running continuously.","acceptance":"Roadmap item — endpoint selection, disclosure and summaries-only mode to be verified when built.","note":""},{"task_id":"T6.6","title":"Opt-in cloud sync","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"M","scope":"Future","depends_on":["T6.1"],"summary":"Optional cloud sync as an alternative to direct device-to-device sync, off by default; direct sync remains available and unchanged.","acceptance":"Roadmap item — acceptance criteria to be written when scheduled. Depends on v1 complete.","note":""},{"task_id":"T6.7","title":"Band A screen variants","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"M","scope":"v1","depends_on":["T1.7","T1.1","T1.2","T1.3"],"summary":"Build the Band A (grades 1–2) variants of the three Demo screens — Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) — selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the screen except where a question truly needs it; tap targets are larger than the 44-point minimum that binds every screen; each screen holds fewer elements at once (one question, one tutor line, one input, one primary action); the visual tone is the playful Band A theme (larger type and artwork, rounder presentation, generous spacing); sessions use the shorter Band A default length; and read-aloud auto-starts through the T1.7 infrastructure. Band B behaviour is unchanged.","acceptance":"With the grade set to 1 or 2, the Diagnostic, Challenge, and Hint display screens all render their Band A variants — tap-to-choose/picture answers, no keyboard by default, larger targets, sparser layout, auto-read on appearance — and with the grade set to 4, the same screens render the Demo Band B versions unchanged. (v1 — not in the demo.)","note":""},{"task_id":"T6.8","title":"Grade-banded UI copy packs","epic":6,"epic_name":"v1 hardening (post-hackathon)","status":"not_started","size":"S","scope":"v1","depends_on":["T1.7","T1.1","T1.2","T1.3"],"summary":"Move every child-facing interface string — button labels, instructions, tutor prompts shown as text, and system messages on the Diagnostic, Challenge, and Hint display screens and the other child-app screens — into UI copy packs keyed by the grade parameter, so the same screen speaks at the child's own grade reading level instead of a single fixed level. A copy pack changes wording only: it never changes what a screen does, its layout structure, or any rule. A string missing from a grade's pack falls back to the Band B pack and is logged as a missing string, never shown as a blank or a raw key.","acceptance":"Changing only the grade parameter changes the interface wording on the child-app screens to that grade's pack, with no change to layout, behaviour, or rules; a deliberately removed string falls back and is logged rather than rendering blank. (v1 — not in the demo.)","note":""},{"task_id":"T7.1","title":"CI pipeline setup","epic":7,"epic_name":"CI/CD and release automation","status":"not_started","size":"M","scope":"Demo","depends_on":["T0.1"],"summary":"Set up a CI pipeline (Xcode Cloud or GitHub Actions on macOS runners) from the T0.1 workspace and the repo the user pushes code to, linked to the user's Xcode Cloud or GitHub Actions account. The pipeline config (ci.yml or Xcode Cloud config) lives in the repo and runs on every push: build both targets, then run the test suite.","acceptance":"Every push triggers build + test; green on clean code, red on broken code. A push with no pipeline run at all fails acceptance, even if the code builds locally.","note":""},{"task_id":"T7.2","title":"Automated archive and TestFlight upload","epic":7,"epic_name":"CI/CD and release automation","status":"not_started","size":"M","scope":"Demo","depends_on":["T7.1"],"summary":"Extend the T7.1 pipeline with archive and upload jobs: on push to main (or on tag), the pipeline archives the app and uploads the build to TestFlight in App Store Connect with no manual steps. Prerequisite (user one-time, not a task): the App Store Connect API key is stored in CI secrets only — never in the repo — and the distribution entitlement (T0.4) is approved.","acceptance":"Push to main produces a TestFlight build with no manual steps; no secrets in repo — a repo-wide search finds no API key, secret, or credential in any committed file.","note":""},{"task_id":"T7.3","title":"Release versioning and checklist","epic":7,"epic_name":"CI/CD and release automation","status":"not_started","size":"S","scope":"Demo","depends_on":["T7.1"],"summary":"Add release versioning on top of the T7.1 pipeline: a version-bump script implementing the versioning scheme (semantic version + auto-incrementing build number), a TestFlight release-notes template, and a release checklist doc, so versioning is one script run and every TestFlight build carries the correct version/build and release notes.","acceptance":"Version bump is one script run; every TestFlight build carries correct version/build + release notes.","note":""},{"task_id":"T7.4","title":"App Store submission prep","epic":7,"epic_name":"CI/CD and release automation","status":"not_started","size":"M","scope":"v1","depends_on":["T7.2"],"summary":"Prepare the v1 App Store submission from the T7.2 pipeline output and the App Store Connect listing requirements: draft the listing (description, keywords, categories, privacy policy), build the screenshot set, complete a submission checklist covering the entitlement, privacy and review requirements, and write the review-notes text explaining the FamilyControls use for App Review.","acceptance":"Listing is submission-ready (all fields drafted); submission checklist is complete. (v1 — not in the demo.)","note":""},{"task_id":"T7.5","title":"On-device release verification","epic":7,"epic_name":"CI/CD and release automation","status":"not_started","size":"S","scope":"Demo","depends_on":["T7.2"],"summary":"Manual task, user. Install the T7.2 TestFlight build on the user's iPhone (Screen Time + FamilyControls authorized) and verify every demo moment on the real device, recording a pass/fail verification report per moment.","acceptance":"All demo moments pass on the real device via TestFlight; any failure filed as a bug with steps to reproduce. Verification on a simulator does not satisfy this task.","note":""}]</script>
+<script>
+"use strict";
+const TASKS = JSON.parse(document.getElementById('task-data').textContent);
+const LS_KEY = 'earnplay-dashboard-v1';
+const STATUSES = ['not_started','in_progress','blocked','done'];
+const STATUS_LABEL = {not_started:'Not started',in_progress:'In progress',blocked:'Blocked',done:'Done'};
+const DEADLINE = new Date('2026-11-05T02:00:00Z').getTime(); // Nov 4, 2026 9:00 PM ET
+
+let overrides = {};
+try { overrides = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch(e){ overrides = {}; }
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(overrides)); }
+function st(t){ return (overrides[t.task_id] && overrides[t.task_id].status) || t.status; }
+function note(t){ return (overrides[t.task_id] && overrides[t.task_id].note) || t.note || ''; }
+function setStatus(id, s){ overrides[id] = overrides[id]||{}; overrides[id].status = s; save(); render(); }
+function setNote(id, v){ overrides[id] = overrides[id]||{}; overrides[id].note = v; save(); }
+
+const filters = {epic:'', status:'', scope:'', q:''};
+const $ = id => document.getElementById(id);
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function render(){
+  const done = TASKS.filter(t=>st(t)==='done').length;
+  const demoTasks = TASKS.filter(t=>t.scope==='Demo');
+  const demoDone = demoTasks.filter(t=>st(t)==='done').length;
+  const counts = {}; STATUSES.forEach(s=>counts[s]=TASKS.filter(t=>st(t)===s).length);
+
+  $('stats').innerHTML =
+    `<div class="stat"><div class="n">${done}/44</div><div class="l">tasks done</div></div>`+
+    STATUSES.map(s=>`<div class="stat"><div class="n">${counts[s]}</div><div class="l">${STATUS_LABEL[s].toLowerCase()}</div></div>`).join('');
+  $('overallLabel').textContent = `Overall progress — ${done} of 44 done (${Math.round(done/44*100)}%)`;
+  $('overallBar').style.width = (done/44*100)+'%';
+  $('demoLabel').textContent = `Demo readiness — ${demoDone} of ${demoTasks.length} demo tasks done (${Math.round(demoDone/demoTasks.length*100)}%)`;
+  $('demoBar').style.width = (demoDone/demoTasks.length*100)+'%';
+
+  // Next up: not started, all deps done
+  const byId = {}; TASKS.forEach(t=>byId[t.task_id]=t);
+  const next = TASKS.filter(t=>st(t)==='not_started' &&
+    (t.depends_on||[]).every(d=>byId[d] && st(byId[d])==='done'));
+  $('nextup').innerHTML = next.length ? next.map(t=>
+    `<button data-start="${esc(t.task_id)}">${esc(t.task_id)} — ${esc(t.title)}</button>`).join('')
+    : '<div class="empty">Nothing unblocked right now.</div>';
+  document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>setStatus(b.dataset.start,'in_progress'));
+
+  // Blocked
+  const blocked = TASKS.filter(t=>st(t)==='blocked');
+  $('blocked').innerHTML = blocked.length ? blocked.map(t=>
+    `<div class="task st-blocked"><span class="id">${esc(t.task_id)}</span> <span class="title">${esc(t.title)}</span></div>`).join('')
+    : '<div class="empty">Nothing blocked.</div>';
+
+  // Epics
+  const epics = [];
+  TASKS.forEach(t=>{ if(!epics[t.epic]) epics[t.epic]={n:t.epic,name:t.epic_name,total:0,done:0}; });
+  TASKS.forEach(t=>{ epics[t.epic].total++; if(st(t)==='done') epics[t.epic].done++; });
+  $('epics').innerHTML = epics.filter(Boolean).map(e=>
+    `<div class="epic${String(filters.epic)===String(e.n)?' active':''}" data-epic="${e.n}">
+       <div class="t">Epic ${e.n} — ${esc(e.name)}</div>
+       <div class="c">${e.done}/${e.total} done</div>
+       <div class="bar"><div style="width:${e.total?e.done/e.total*100:0}%"></div></div>
+     </div>`).join('');
+  document.querySelectorAll('.epic').forEach(el=>el.onclick=()=>{
+    filters.epic = String(filters.epic)===el.dataset.epic ? '' : el.dataset.epic;
+    $('fEpic').value = filters.epic; render();
+  });
+
+  // Task list
+  const q = filters.q.trim().toLowerCase();
+  const list = TASKS.filter(t=>
+    (filters.epic==='' || String(t.epic)===String(filters.epic)) &&
+    (filters.status==='' || st(t)===filters.status) &&
+    (filters.scope==='' || t.scope===filters.scope) &&
+    (!q || (t.task_id+' '+t.title+' '+(t.summary||'')).toLowerCase().includes(q))
+  );
+  $('tasks').innerHTML = list.length ? list.map(t=>{
+    const s = st(t);
+    return `<div class="task st-${s}">
+      <div class="row1">
+        <span class="id">${esc(t.task_id)}</span>
+        <span class="badge size">${esc(t.size)}</span>
+        <span class="badge scope-${esc(t.scope)}">${esc(t.scope)}</span>
+        <span class="title">${esc(t.title)}</span>
+      </div>
+      <div class="meta">Epic ${t.epic} · ${esc(t.epic_name)}${(t.depends_on&&t.depends_on.length)?' · depends on '+t.depends_on.map(esc).join(', '):' · no dependencies'}</div>
+      <div class="sum">${esc(t.summary||'')}</div>
+      ${t.acceptance?`<details><summary>Acceptance criteria</summary><div>${esc(t.acceptance)}</div></details>`:''}
+      <div class="ctl">
+        <select data-status-for="${esc(t.task_id)}" aria-label="Status for ${esc(t.task_id)}">
+          ${STATUSES.map(x=>`<option value="${x}"${x===s?' selected':''}>${STATUS_LABEL[x]}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ctl"><textarea data-note-for="${esc(t.task_id)}" placeholder="Notes…">${esc(note(t))}</textarea></div>
+    </div>`;
+  }).join('') : '<div class="empty">No tasks match the filters.</div>';
+
+  document.querySelectorAll('[data-status-for]').forEach(sel=>
+    sel.onchange=()=>setStatus(sel.dataset.statusFor, sel.value));
+  document.querySelectorAll('[data-note-for]').forEach(ta=>{
+    let deb; ta.oninput=()=>{ clearTimeout(deb); deb=setTimeout(()=>setNote(ta.dataset.noteFor, ta.value), 400); };
+  });
+}
+
+function tick(){
+  const ms = DEADLINE - Date.now();
+  if(ms <= 0){ $('countdown').innerHTML = 'Deadline <b>passed</b>'; return; }
+  const d=Math.floor(ms/864e5), h=Math.floor(ms/36e5)%24, m=Math.floor(ms/6e4)%60, s=Math.floor(ms/1e3)%60;
+  $('countdown').innerHTML = `Submission deadline in <b>${d}d ${h}h ${m}m ${s}s</b>`;
+}
+
+// Epic filter options
+(function(){
+  const seen = {};
+  TASKS.forEach(t=>{ if(!(t.epic in seen)) seen[t.epic]=t.epic_name; });
+  $('fEpic').innerHTML = '<option value="">All epics</option>' +
+    Object.keys(seen).sort((a,b)=>a-b).map(k=>`<option value="${k}">Epic ${k} — ${esc(seen[k])}</option>`).join('');
+})();
+
+$('fEpic').onchange=e=>{filters.epic=e.target.value;render();};
+$('fStatus').onchange=e=>{filters.status=e.target.value;render();};
+$('fScope').onchange=e=>{filters.scope=e.target.value;render();};
+$('fSearch').oninput=e=>{filters.q=e.target.value;render();};
+$('fClear').onclick=()=>{filters.epic=filters.status=filters.scope=filters.q='';
+  $('fEpic').value='';$('fStatus').value='';$('fScope').value='';$('fSearch').value='';render();};
+
+render(); tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>
