@@ -286,7 +286,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T2.2 --- Shield manager \[TASKS-t2-2-shield-manager\]
 
-**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.4 (development entitlement), T2.1
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.4, T2.1
 
 **What to build:** Apply and remove ManagedSettings shields from policy, enumeration-first: shield every app except the allowlist, using the apps enumerated via FamilyActivityPicker at setup (see T2.3), with category shields as a backstop for newly installed apps that are not yet enumerated. Do not rely on a per-app exemption overriding a category shield. Run unlock timers on a monotonic clock (system uptime, not wall-clock time) so changing the device clock cannot extend an unlock. Re-lock automatically on expiry, and re-evaluate any open unlock window after a restart. The on-device prototype for this approach is confirmation-only --- verify that enumeration works on device; do not gate the architecture on it. Caveat: absence from public docs is not proof; only the on-device prototype settles it for certain.
 
@@ -382,7 +382,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T3.2 --- Chore trade \[TASKS-t3-2-chore-trade\]
 
-**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T1.4 --- demo uses a seeded chore pool; the editor is T4.1
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T1.4, T4.1
 
 **What to build:** The AI offers exactly one chore from the parent-stocked pool mid-session, chosen with rotation and time-of-day fit. The child accepts or declines and taps done; the parent confirms completion and the unlock is granted. The child never sees a chore menu or list.
 
@@ -442,7 +442,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T4.1 --- Policy editor \[TASKS-t4-1-policy-editor\]
 
-**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.1 (policy schema from T2.1)
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.1, T2.1
 
 **What to build:** Edit every policy field: always-allowed apps, the unblockable list, never-unlockable overrides, unlock durations, caps, the chore pool (chore, unlock minutes, expiry, verification mode), and movement-trade settings. Saving bumps the policy version and queues it for sync.
 
@@ -610,7 +610,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T5.4 --- Demo staging \[TASKS-t5-4-demo-staging\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** All Demo tasks
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.3, T4.4, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.2, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5
 
 **What to build:** Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies --- practice, movement, and chore; (4) the auditor catches a staged leniency error.
 
@@ -670,7 +670,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T6.2 --- Multi-child support \[TASKS-t6-2-multi-child-support\]
 
-**Size:** M --- about half a day • **Scope:** Future • **Depends on:** v1 complete
+**Size:** M --- about half a day • **Scope:** Future • **Depends on:** T0.4, T3.4, T6.1, T6.7, T6.8, T7.4
 
 **What to build:** Extend policy, profiles, logs and the dashboard to more than one child.
 
@@ -688,7 +688,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T6.3 --- Speech scoring for read-aloud \[TASKS-t6-3-speech-scoring-for-read-aloud\]
 
-**Size:** M --- about half a day • **Scope:** Future • **Depends on:** v1 complete
+**Size:** M --- about half a day • **Scope:** Future • **Depends on:** T0.4, T3.4, T6.1, T6.7, T6.8, T7.4
 
 **What to build:** Score read-aloud practice on-device as part of the reading profile.
 
@@ -706,7 +706,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T6.4 --- Fuller curriculum \[TASKS-t6-4-fuller-curriculum\]
 
-**Size:** L --- about a full day • **Scope:** Future • **Depends on:** v1 complete
+**Size:** L --- about a full day • **Scope:** Future • **Depends on:** T0.4, T3.4, T6.1, T6.7, T6.8, T7.4
 
 **What to build:** Broaden skills and question forms beyond the demo\'s 4th-grade core set.
 
@@ -742,7 +742,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T6.6 --- Opt-in cloud sync \[TASKS-t6-6-opt-in-cloud-sync\]
 
-**Size:** M --- about half a day • **Scope:** Future • **Depends on:** v1 complete
+**Size:** M --- about half a day • **Scope:** Future • **Depends on:** T0.4, T3.4, T6.1, T6.7, T6.8, T7.4
 
 **What to build:** Optional cloud sync as an alternative to direct device-to-device sync, off by default.
 
