@@ -145,6 +145,8 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 - **On-device model:** quantized Meta open-weights, llama.cpp/MLC-style route; runs on the device, no server.
 - **CI:** Xcode Cloud or GitHub Actions macOS runners.
 - **Pilot:** plain HTML/JS, no build step, no backend.
+- **Source layout (iOS code repo, when created):** `EarnPlay/` (child app target), `EarnPlayAdmin/` (admin app target), `EarnPlayCore/` (shared Swift package: models, schemas, solver), `EarnPlayTests/` (test targets).
+- **Source layout (pilot, in this repo):** `pilot/` --- single page (`index.html`, `app.js`, `questions.js`), no build step; the Copilot agent builds it here because the build issue lives in this repo.
 
 ## 11. Canonical facts --- Scope \[SSOT-canonical-facts-scope\]
 
@@ -218,4 +220,6 @@ Which derived docs mirror which sections of this document.
   2026-10-18              Pilot section added: web PoC of the core tutor loop (validates the interaction design + tests Copilot build performance); HLD §10, LLD §14.1, Epic 8 (T8.1--T8.5, Demo scope); 49 tasks, 38 in the demo definition of done.   SSOT, HLD, LLD, Task Breakdown
 
   2026-10-18              Tech stack section added: Swift + SwiftUI picked over UIKit (build speed, FamilyActivityPicker is SwiftUI-native, concise for agents); Xcode workspace + shared Swift package; Apple frameworks; quantized on-device model; CI options; pilot plain HTML/JS.                                                                                  SSOT
+
+  2026-10-18              Source layout defined: iOS code repo (EarnPlay/, EarnPlayAdmin/, EarnPlayCore/, EarnPlayTests/); pilot at pilot/ in this repo (index.html, app.js, questions.js).                                                                                                                                               SSOT
   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
