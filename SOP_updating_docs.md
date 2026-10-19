@@ -8,18 +8,19 @@ the docs without breaking consistency.
 
 ## The lane rule (read this first)
 
-- **The Markdown pack is the agent-editable layer.** All doc edits happen in
-  the `.md` files under `md-pack/`.
-- **The `.docx` files are generated artifacts** (each rebuilt from per-doc
-  build scripts). Agents must NEVER hand-edit `.docx` XML or the `.src/`
-  generator scripts.
-- **Promotion:** after the agent finishes and the checker is green, the
-  changed `.md` files are handed back; `.docx` regeneration is a separate
-  maintainer step. The agent's job ends at a green, changelogged md pack.
+## The lane rule (read this first)
+
+- **The `.md` files at the repo root are the source of truth.** All doc edits
+  happen here. When any doc disagrees, `00-source-of-truth.md` wins.
+- **The `.docx` files under `source-docx/` are the originals** the `.md`
+  files were generated from. Agents must NEVER hand-edit them.
+- **Regeneration:** if the `.docx` originals change, the `.md` files are
+  regenerated over the repo root via `SOP_docx_to_markdown.md`. The agent's
+  job ends at a green, changelogged set of `.md` files.
 
 ## File map
 
-| File | Role |
+| File (repo root) | Role |
 |---|---|
 | `00-source-of-truth.md` | Canonical facts. Disagreements resolve in its favor. Edit shared facts HERE first. |
 | `01-high-level-design.md` | Product design. |
@@ -33,8 +34,8 @@ the docs without breaking consistency.
 
 ## Prerequisites
 
-1. A fresh pack (see `SOP_docx_to_markdown.md`), or the current `md-pack/`.
-2. Baseline must be green: `python3 check_md_pack.py` →
+1. The repo's current `.md` files (regenerate via `SOP_docx_to_markdown.md` if the `.docx` originals changed).
+2. Baseline must be green, run from the repo root: `python3 check_md_pack.py .` →
    `OK: md-pack consistent, no drift.`
 
 ## The sync process (execute in order)
@@ -64,7 +65,7 @@ in the SSOT. Keep all docs mutually consistent — no doc may contradict the
 SSOT or another derived doc.
 
 ### Step 5 — Verify
-Run `python3 check_md_pack.py` until it reports green. Fix every DRIFT line.
+Run `python3 check_md_pack.py .` from the repo root until it reports green. Fix every DRIFT line.
 Do not declare done while any check fails.
 
 ### Step 6 — Changelog
@@ -93,11 +94,11 @@ what changed, which docs were updated.
 
 ## Verification checklist
 
-- [ ] `check_md_pack.py` green before starting (baseline).
+- [ ] `check_md_pack.py .` green before starting (baseline).
 - [ ] Impact list written before any edit.
 - [ ] SSOT edited first (or explicitly skipped as derived-only with reason).
 - [ ] All impacted derived docs updated; no contradictions with SSOT.
-- [ ] `check_md_pack.py` green after editing.
+- [ ] `check_md_pack.py .` green after editing.
 - [ ] Changelog row added to `00-source-of-truth.md`.
 - [ ] `06-hackathon-application.md` untouched.
 
@@ -112,9 +113,7 @@ When done, report:
 
 ## Promotion to .docx (maintainer step, not the agent's)
 
-The agent's deliverable is the green md pack + the report above. Regenerating
-the `.docx` files from the changed `.md` files is a separate step owned by
-the maintainer's doc pipeline. The agent must not attempt it.
+The agent's deliverable is the green, changelogged `.md` set at the repo root + the report above. If the `.docx` originals change, the `.md` files are regenerated over the repo root via `SOP_docx_to_markdown.md` — a separate maintainer step the agent must not attempt.
 
 ## New tasks and tasks.json
 
@@ -146,7 +145,7 @@ layer; never touch .docx files. Read 00-source-of-truth.md first — it is
 canonical and wins every disagreement. 06-hackathon-application.md is frozen.
 
 Follow SOP_updating_docs.md for every change: impact tracing in writing,
-SSOT first, propagate to derived docs, check_md_pack.py until green,
+SSOT first, propagate to derived docs, check_md_pack.py . until green,
 changelog entry, then report what changed plus the final checker output.
 
 Section IDs are permanent: never rename or reuse one. References cite IDs,

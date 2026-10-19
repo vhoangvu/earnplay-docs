@@ -2,16 +2,21 @@
 
 ## Purpose
 
-Generate a Markdown pack from the seven EarnPlay Word docs so the project can be
-handed to any CLI coding harness (Claude Code, Kiro CLI, Muse Code, etc.).
-The .docx files remain the source of truth; the Markdown pack is a generated
-export. Never hand-edit the Markdown — regenerate it.
+Generate the Markdown files from the seven EarnPlay Word docs so the project
+can be handed to any CLI coding harness (Claude Code, Kiro CLI, Muse Code,
+Copilot cloud agent, etc.).
+
+**Source-of-truth rule:** the `.md` files at the repo root are the source of
+truth for any agent working from the repo. The conversion writes directly to
+the repo root. Never hand-edit the generated Markdown to fix a conversion
+problem — fix the `.docx` (or the script) and regenerate.
 
 ## When to run
 
-- After any .docx doc changes (design edit, new task, scope change).
+- After any `.docx` doc changes (design edit, new task, scope change).
 - Before handing the project to a CLI harness.
-- The pack is stale the moment a .docx changes. If in doubt, regenerate.
+- The `.md` files are stale the moment a `.docx` changes. If in doubt,
+  regenerate.
 
 ## Prerequisites
 
@@ -25,138 +30,127 @@ export. Never hand-edit the Markdown — regenerate it.
    (then run the conversion script with `~/earnplay-venv/bin/python3`).
    (On macOS, `brew install pandoc` also works; the script below uses
    pypandoc so either is fine.)
-3. The docs must pass the consistency checker first:
+3. The docs must pass the consistency checker first. On the original VM:
    `python3 ~/workspace/earnplay-docs/check_docs.py`
    Expected output: `OK: all 6 docs consistent, no drift.` (exit 0).
+   In the repo: `python3 check_md_pack.py .` from the repo root, expect
+   `OK: md-pack consistent, no drift.`
    Do not convert a red (drifting) doc set.
 
 ## Source docs
 
-| # | Markdown name | Source .docx |
+Repo layout (primary):
+
+| # | Output at repo root | Source `.docx` in `source-docx/` |
 |---|---|---|
-| 00 | `00-source-of-truth.md` | `~/workspace/your_files/earnplay-source-of-truth/EarnPlay — Source of Truth.docx` |
-| 01 | `01-high-level-design.md` | `~/workspace/your_files/earnplay-high-level-design/EarnPlay — High-Level Design.docx` |
-| 02 | `02-low-level-design.md` | `~/workspace/your_files/earnplay-low-level-design/EarnPlay — Low-Level Design.docx` |
-| 03 | `03-build-task-breakdown.md` | `~/workspace/your_files/earnplay-build-task-breakdown/EarnPlay — Build Task Breakdown.docx` |
-| 04 | `04-entitlement-justification.md` | `~/workspace/your_files/earnplay-familycontrols-entitlement-justification/EarnPlay — FamilyControls Entitlement Request Justification.docx` |
-| 05 | `05-kickoff-checklist.md` | `~/workspace/your_files/earnplay-t01-t04-kickoff-checklist/EarnPlay T0.1 + T0.4 Kickoff Checklist.docx` |
-| 06 | `06-hackathon-application.md` | `~/workspace/your_files/pocket-tutor-hackathon-application/EarnPlay — Hackathon Application Draft.docx` (submitted — read-only, do not edit the .docx either) |
+| 00 | `00-source-of-truth.md` | `00-source-of-truth.docx` |
+| 01 | `01-high-level-design.md` | `01-high-level-design.docx` |
+| 02 | `02-low-level-design.md` | `02-low-level-design.docx` |
+| 03 | `03-build-task-breakdown.md` | `03-build-task-breakdown.docx` |
+| 04 | `04-entitlement-justification.md` | `04-entitlement-justification.docx` |
+| 05 | `05-kickoff-checklist.md` | `05-kickoff-checklist.docx` |
+| 06 | `06-hackathon-application.md` | `06-hackathon-application.docx` |
+
+(On the original VM the sources live under `~/workspace/your_files/<slug>/`
+with longer filenames — set `SRC` below to that folder and adjust the
+filenames in the `docs` list accordingly.)
 
 ## Procedure
 
-Run from any directory. The script wipes and recreates the pack directory, so
-it is always a clean export.
+Run from the repo root. The script overwrites the 7 `.md` files in place —
+that is the point: the repo root is the published pack.
 
 ```bash
 python3 - <<'EOF'
 import pypandoc, json, shutil, os
 from pathlib import Path
 
-home = Path.home()
-BASE = home / "workspace"  # <-- change this if your files live elsewhere
-out = BASE / "earnplay-docs/md-pack"
-shutil.rmtree(out, ignore_errors=True)
-(out / "media").mkdir(parents=True)
-os.chdir(out)  # pandoc resolves --extract-media relative to the working dir
+BASE = Path.cwd()  # repo root; change if running elsewhere
+SRC = BASE / "source-docx"  # the 7 .docx files
+OUT = BASE                  # repo root — the .md files here are the source of truth
+
+os.chdir(OUT)  # pandoc resolves --extract-media relative to the working dir
+(OUT / "media").mkdir(exist_ok=True)
 
 docs = [
-    ("00-source-of-truth.md",        BASE/your_files/earnplay-source-of-truth/EarnPlay — Source of Truth.docx"),
-    ("01-high-level-design.md",       BASE/your_files/earnplay-high-level-design/EarnPlay — High-Level Design.docx"),
-    ("02-low-level-design.md",        BASE/your_files/earnplay-low-level-design/EarnPlay — Low-Level Design.docx"),
-    ("03-build-task-breakdown.md",   BASE/your_files/earnplay-build-task-breakdown/EarnPlay — Build Task Breakdown.docx"),
-    ("04-entitlement-justification.md", BASE/your_files/earnplay-familycontrols-entitlement-justification/EarnPlay — FamilyControls Entitlement Request Justification.docx"),
-    ("05-kickoff-checklist.md",       BASE/your_files/earnplay-t01-t04-kickoff-checklist/EarnPlay T0.1 + T0.4 Kickoff Checklist.docx"),
-    ("06-hackathon-application.md",   BASE/your_files/pocket-tutor-hackathon-application/EarnPlay — Hackathon Application Draft.docx"),
+    ("00-source-of-truth.md",         "00-source-of-truth.docx"),
+    ("01-high-level-design.md",        "01-high-level-design.docx"),
+    ("02-low-level-design.md",         "02-low-level-design.docx"),
+    ("03-build-task-breakdown.md",    "03-build-task-breakdown.docx"),
+    ("04-entitlement-justification.md","04-entitlement-justification.docx"),
+    ("05-kickoff-checklist.md",        "05-kickoff-checklist.docx"),
+    ("06-hackathon-application.md",    "06-hackathon-application.docx"),
 ]
 
-for name, src in docs:
+for name, src_name in docs:
+    src = SRC / src_name
     assert src.exists(), f"MISSING: {src}"
-    pypandoc.convert_file(str(src), "md", outputfile=str(out/name),
+    pypandoc.convert_file(str(src), "md", outputfile=str(OUT / name),
                           extra_args=["--extract-media=media", "--wrap=none"])
     print("converted", name)
 
-# tasks.json rides along for machine-readable task iteration
-shutil.copy(BASE/earnplay-docs/tasks.json", out/"tasks.json")
-json.load(open(out/"tasks.json"))  # validates
-print("tasks.json copied and valid")
-print("pack at", out)
+# tasks.json lives at the repo root; refresh it from the task breakdown
+shutil.copy(BASE / "tasks.json", OUT / "tasks.json")
+json.load(open(OUT / "tasks.json"))  # validates
+print("tasks.json refreshed and valid")
+print("pack at", OUT)
 EOF
 ```
 
-Then copy the pointer file into the pack. If `md-pack-AGENTS.md` does not exist
-yet, create it from Appendix A first, then copy it verbatim on every run
-(it is not generated from the docs):
-
-```bash
-cp ~/workspace/earnplay-docs/md-pack-AGENTS.md ~/workspace/earnplay-docs/md-pack/AGENTS.md
-```
-
-(If you changed `BASE` because your files live elsewhere, use your base path
-in place of `~/workspace` in the `cp` command too.)
-
-## Transferring the pack to your machine
-
-The SOP runs wherever the .docx files live. To use the pack with a CLI
-harness on a different machine (e.g. your Mac):
-
-1. Zip the pack: `cd ~/workspace/earnplay-docs && zip -r earnplay-md-pack.zip md-pack`
-2. Download `earnplay-md-pack.zip` (via chat or the Library) and unzip it
-   on the target machine.
-3. Alternatively, download the 7 .docx files, set `BASE` in the script to
-   their parent folder, and run the SOP there.
-
-## Handing the pack to the harness
-
-The pack is complete at `md-pack/`. Point the CLI at that directory
-(or open `AGENTS.md` inside it first) — it contains the doc hierarchy,
-the rules, and the machine-readable `tasks.json`.
+`AGENTS.md` at the repo root is the pointer file (content = Appendix A). It is
+not generated from the docs — leave it alone.
 
 ## Verification checklist
 
-- [ ] `check_docs.py` was green before converting.
-- [ ] All 7 `.md` files exist in `md-pack/`.
-- [ ] `tasks.json` exists and parses
-      (`cd ~/workspace/earnplay-docs/md-pack && python3 -c "import json; json.load(open('tasks.json'))"`).
-- [ ] `AGENTS.md` exists in the pack.
+- [ ] The checker was green before converting.
+- [ ] All 7 `.md` files exist at the repo root (fresh timestamps).
+- [ ] `tasks.json` parses (`python3 -c "import json; json.load(open('tasks.json'))"` from the repo root).
+- [ ] `AGENTS.md` exists at the repo root and matches Appendix A.
 - [ ] Spot-check `00-source-of-truth.md`: headings present (`grep -c '^#'`),
       section IDs visible as `\[SSOT-...\]` (pandoc escapes the brackets;
       this is expected, do not "fix" it by hand), and the Doc map table
       reads correctly.
 - [ ] `media/` contains extracted diagram images (HLD/LLD have figures; pandoc
       nests them at `media/media/` — expected). Verify every image ref resolves
-      (run from inside the pack dir — the `*.md` glob only matches there):
-      `cd ~/workspace/earnplay-docs/md-pack && for f in $(grep -oh "media/[a-z0-9/._-]*\.\(png\|jpg\|jpeg\|gif\)" *.md | sort -u); do [ -f "$f" ] || echo "BROKEN: $f"; done`
+      (run from the repo root — the `*.md` glob only matches there):
+      `for f in $(grep -oh "media/[a-z0-9/._-]*\.\(png\|jpg\|jpeg\|gif\)" 0*.md | sort -u); do [ -f "$f" ] || echo "BROKEN: $f"; done`
 
 ## Rules
 
-1. **.docx is the source of truth.** All edits go through the doc pipeline
-   (SSOT first, propagate, checker green). The Markdown pack is downstream.
-2. **Never hand-edit the pack.** A hand edit will be wiped on the next run.
-   Fix the .docx and regenerate.
-3. **Regenerate after every doc change** before giving the pack to a harness.
+1. **The repo-root `.md` files are the source of truth for agents.** All
+   agent edits happen there (see `SOP_updating_docs.md`). The `.docx` files
+   under `source-docx/` are the originals — read-only for agents.
+2. **Never hand-edit the generated `.md` to fix a conversion problem.**
+   Fix the `.docx` (or the script) and regenerate.
+3. **Regenerate after every `.docx` change** before giving the repo to a
+   harness.
 4. The `06-hackathon-application.md` is a frozen record (application already
-   submitted). It converts like the rest but its .docx must not be edited.
+   submitted). It converts like the rest but its `.docx` must not be edited.
 
 ## Troubleshooting
 
 - `pypandoc` import error → `pip install pypandoc-binary`; on PEP 668 systems
   add `--break-system-packages` or use a venv (see Prerequisites).
-- `MISSING:` assertion → a .docx was renamed/moved; the artifact folders are
-  the build directories — do not move them (see 2026-10-18 decision).
+- `MISSING:` assertion → a `.docx` was renamed/moved; check `source-docx/`.
 - Checker red → fix the docs first; never convert a drifting set.
 - A harness complains about `\[...\]` escapes → they are valid Markdown and
   the IDs remain searchable; leave them.
 
-## Appendix A — AGENTS.md pointer file (write once)
+## Appendix A — AGENTS.md pointer file
 
-Save the following as `~/workspace/earnplay-docs/md-pack-AGENTS.md`.
-It is copied verbatim into every pack.
+The repo-root `AGENTS.md` carries this content. It is maintained by hand,
+never generated.
 
 ```markdown
 # EarnPlay — agent instructions
 
 You are building EarnPlay, a private on-device iOS tutor + app gate for kids
 (grades 1–5 target; demo ships 4th-grade content only).
+
+## Source of truth
+
+The `.md` files at the repo root are the source of truth. `source-docx/`
+holds the original Word files — read-only, never edit them.
 
 ## Document hierarchy
 
@@ -183,4 +177,6 @@ You are building EarnPlay, a private on-device iOS tutor + app gate for kids
   safety-critical decision. Every math answer is solver-verified.
 - Do not invent facts. If a doc is ambiguous, the Source of Truth decides;
   if it is silent, ask before inventing.
+- Doc updates follow `SOP_updating_docs.md`: impact tracing in writing,
+  SSOT first, propagate, `check_md_pack.py` until green, changelog entry.
 ```
