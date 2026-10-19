@@ -11,7 +11,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **How to use this document**                                                                                                                                                                                                                                                                                                                                                                                                           |
 |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (40 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
+| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (41 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
 +========================================================================================================================================================================================================================================================================================================================================================================================================================================+
 
 +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -43,9 +43,9 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   7 --- CI/CD and release automation   T7.1--T7.5 (5)    4 / 1 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification; App Store submission prep in v1
 
-  8 --- Pilot web PoC                  T8.1--T8.6 (6)    6 / 0 / 0                Web proof of concept of the core loop + in-browser model (tutor messages, parallel effort judge); validates the interaction design and tests coding-agent build performance
+  8 --- Pilot web PoC                  T8.1--T8.7 (7)    7 / 0 / 0                Web proof of concept of the core loop + switchable model backends (browser / local / cloud; tutor messages, parallel effort judge); validates the interaction design and tests coding-agent build performance
 
-  **Total**                            **51 tasks**      **40 / 6 / 5**           **Demo is the definition of done for the hackathon**
+  **Total**                            **52 tasks**      **41 / 6 / 5**           **Demo is the definition of done for the hackathon**
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Reading a task block:** Every task gives its ID and title, what to build, a verifiable acceptance line, its dependencies, its size, and its scope tag. Work a task only when its dependencies are done --- the dependency line is the gate, not a suggestion.
@@ -628,7 +628,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T5.4 --- Demo staging \[TASKS-t5-4-demo-staging\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.3, T4.4, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.2, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.3, T4.4, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.2, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7
 
 **What to build:** Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies --- practice, movement, and chore; (4) the auditor catches a staged leniency error.
 
@@ -912,7 +912,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ------------------------------------------------------------------------
 
-*Pre-kickoff validation, sequenced before Epic 0. A quick web-based proof of concept of the core tutor loop (challenge → effort judgment → simulated unlock), built to validate the interaction design with a real child and to test coding-agent build performance on a small, well-specified feature. Web-only, throwaway code --- nothing ships in the iOS app. All five tasks are Demo scope.*
+*Pre-kickoff validation, sequenced before Epic 0. A quick web-based proof of concept of the core tutor loop (challenge → effort judgment → simulated unlock), built to validate the interaction design with a real child and to test coding-agent build performance on a small, well-specified feature. Web-only, throwaway code --- nothing ships in the iOS app. All seven tasks are Demo scope.*
 
 ### T8.1 --- Pilot web scaffold \[TASKS-t8-1-pilot-web-scaffold\]
 
@@ -1022,6 +1022,24 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **References:** SSOT-canonical-facts-scope; HLD-pilot-web-proof-of-concept; LLD-pilot-web-poc-module-mapping
 
+### T8.7 --- Switchable model endpoints (browser / local / cloud) \[TASKS-t8-7-switchable-model-endpoints-browser-local-cloud\]
+
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T8.6
+
+**What to build:** Refactor the T8.6 WebLLM integration behind a `ModelBackend` interface with three backends. (1) **Browser** --- the existing WebLLM integration, unchanged in behavior, now one backend behind the interface; still the default, still lazy-loaded on first user gesture. (2) **Local** --- any OpenAI-compatible chat-completions endpoint on localhost (e.g. Ollama): base URL (default `http://localhost:11434/v1`) and model name configurable in the panel, with a "Test connection" button that lists models. (3) **Cloud** --- any OpenAI-compatible HTTPS endpoint: base URL, model, and an API key field; the key is held in memory only, never written to localStorage or any other persistent store, and cleared on page reload. All three backends implement the same two jobs: draft tutor messages within the code-chosen ladder level, and judge effort from the transcript (advisory). The AI panel gains a backend selector (Browser | Local | Cloud); the judge panel names which backend produced the verdict. Every guardrail from T8.6 applies identically on all backends: code-chosen ladder level, draft validation (length cap, answer-leak check against the solver-verified answer, bounded regeneration then canned fallback), scorer-only unlock decisions, disagreement flagging. The panel documents the CORS requirement for local/cloud servers (e.g. Ollama needs OLLAMA_ORIGINS set). With no backend enabled, or when the selected backend fails, the pilot works exactly as the deterministic-only version.
+
+> **Inputs:** T8.6 model module (WebLLM load, draft + validate + fallback, judge panel).
+>
+> **Outputs:** `ModelBackend` interface + three backends; backend selector UI with per-backend config; judge verdict labeled by backend; extended test.js.
+>
+> **Automated test:** Extend test.js: (a) all three backends conform to the interface (id, label, status, draft, judge); (b) with fetch mocked, the local and cloud backends send correctly shaped requests (URL, Bearer header for cloud only, body with model + messages) and a network failure degrades gracefully to the canned fallback with no crash; (c) the leak-rejection and 3-attempt fallback behave identically across all three backends (parameterized over backends); (d) after a cloud session, localStorage holds no key material; (e) all existing tests still pass. Pass: (a)--(e) green.
+>
+> **Manual test:** 1) Open the pilot, switch the backend selector between Browser, Local, Cloud --- each shows its own config and status. 2) With a local server running (e.g. Ollama), test the connection, run a session --- tutor lines and the judge verdict come from the local model, labeled as such. 3) Enter a cloud key, run one hint --- the draft arrives via the cloud endpoint; reload the page --- the key field is empty. 4) Stop the local server mid-session --- drafts fall back to canned lines, the scorer still decides, no console errors.
+>
+> **✓ Acceptance criteria:** Three backends switchable from the panel with per-backend config and status; identical guardrails (code-chosen level, validated drafts, scorer-only unlocks, named-backend judge verdicts with disagreement flags) on all three; API key in memory only; pilot fully usable with no backend or a failed backend; all existing tests green plus the new ones.
+>
+> **References:** SSOT-canonical-facts-scope; HLD-pilot-web-proof-of-concept; LLD-pilot-web-poc-module-mapping
+
 ## Dependency map \[TASKS-dependency-map\]
 
 The chains that matter most. If a task on the left slips, everything to its right slips with it.
@@ -1045,12 +1063,12 @@ The chains that matter most. If a task on the left slips, everything to its righ
 
   **Grade-adaptive UX**               T0.1 Scaffolding → T1.7 Read-aloud (Demo); T1.7 + T1.1 / T1.8 / T1.3 Demo screens → T6.7 Band A variants (v1), T6.8 Copy packs (v1)
 
-  **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation; T8.4 → T8.6 Browser model (pre-kickoff validation; informs Epic 1)
+  **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation; T8.4 → T8.6 Browser model → T8.7 Switchable endpoints (pre-kickoff validation; informs Epic 1)
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Demo definition of done --- 40 tasks \[TASKS-demo-definition-of-done-33-tasks\]
+## Demo definition of done --- 41 tasks \[TASKS-demo-definition-of-done-33-tasks\]
 
-**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.3, T4.4, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.2, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6.
+**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.3, T4.4, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.2, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
 
 Held back until Demo is green: T0.4 (v1), T3.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
 

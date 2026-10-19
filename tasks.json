@@ -34,11 +34,11 @@
   "depends": [
    "T0.1"
   ],
-  "description": "Build the deterministic verifier for 4th-grade skills: multiplication facts to 12×12, multi-digit multiplication, division, fraction comparison and addition, and word problems. The solver is plain code — the model never grades its own answers."
+  "description": "Build the deterministic verifier for 4th-grade skills: multiplication facts to 12\u00d712, multi-digit multiplication, division, fraction comparison and addition, and word problems. The solver is plain code \u2014 the model never grades its own answers."
  },
  {
   "id": "T0.4",
-  "title": "Entitlement filing — do first, long lead",
+  "title": "Entitlement filing \u2014 do first, long lead",
   "epic": 0,
   "epic_title": "Setup and long-lead items",
   "status": "not_started",
@@ -75,7 +75,7 @@
    "T0.2",
    "T0.3"
   ],
-  "description": "The model proposes a problem (skill + form + values); the solver verifies it before it is shown. On failure, retry within a bounded count, then fall back to a safe, pre-verified question. Questions use varied, real-world and puzzle-like forms — not plain textbook form."
+  "description": "The model proposes a problem (skill + form + values); the solver verifies it before it is shown. On failure, retry within a bounded count, then fall back to a safe, pre-verified question. Questions use varied, real-world and puzzle-like forms \u2014 not plain textbook form."
  },
  {
   "id": "T1.3",
@@ -88,7 +88,7 @@
   "depends": [
    "T1.2"
   ],
-  "description": "Three hint levels — nudge, then strategy, then one worked step — offered while the child is working. Record every hint use, and track whether a hint is followed by a changed answer."
+  "description": "Three hint levels \u2014 nudge, then strategy, then one worked step \u2014 offered while the child is working. Record every hint use, and track whether a hint is followed by a changed answer."
  },
  {
   "id": "T1.4",
@@ -101,7 +101,7 @@
   "depends": [
    "T1.2"
   ],
-  "description": "Score genuine effort from active minutes (pausing after about 20 seconds with no interaction), attempts, hint interactions, answer revisions, and explanations given. Compare the score against a per-session variable threshold (about 8–14 points) so the target cannot be learned. Enforce the floor rule"
+  "description": "Score genuine effort from active minutes (pausing after about 20 seconds with no interaction), attempts, hint interactions, answer revisions, and explanations given. Compare the score against a per-session variable threshold (about 8\u201314 points) so the target cannot be learned. Enforce the floor rule"
  },
  {
   "id": "T1.5",
@@ -114,7 +114,7 @@
   "depends": [
    "T1.4"
   ],
-  "description": "Detect stalling from signals such as missing revisions, response-time patterns, repeated identical wrong answers, and hints used as an answer key. When signals fire, probe conversationally — “show me one step” or “what have you tried?” — and count a substantive reply as effort."
+  "description": "Detect stalling from signals such as missing revisions, response-time patterns, repeated identical wrong answers, and hints used as an answer key. When signals fire, probe conversationally \u2014 \u201cshow me one step\u201d or \u201cwhat have you tried?\u201d \u2014 and count a substantive reply as effort."
  },
  {
   "id": "T1.6",
@@ -127,7 +127,7 @@
   "depends": [
    "T1.4"
   ],
-  "description": "Every consequential decision — unlock granted or denied, trade offered, difficulty changed — writes a Decision record with a full justification: the decision, the evidence observed, the reasoning, the alternative considered, and a confidence level. Routine actions get a one-line reason."
+  "description": "Every consequential decision \u2014 unlock granted or denied, trade offered, difficulty changed \u2014 writes a Decision record with a full justification: the decision, the evidence observed, the reasoning, the alternative considered, and a confidence level. Routine actions get a one-line reason."
  },
  {
   "id": "T1.7",
@@ -140,7 +140,7 @@
   "depends": [
    "T0.1"
   ],
-  "description": "Build the ReadAloudService for the child app: on-device text-to-speech only (the system's built-in speech, for example AVSpeechSynthesizer — no network call, no downloaded voice), behind one reusable speaker-button component for question, hint, and instruction views (the Diagnostic, Challenge, and H"
+  "description": "Build the ReadAloudService for the child app: on-device text-to-speech only (the system's built-in speech, for example AVSpeechSynthesizer \u2014 no network call, no downloaded voice), behind one reusable speaker-button component for question, hint, and instruction views (the Diagnostic, Challenge, and H"
  },
  {
   "id": "T1.8",
@@ -155,7 +155,7 @@
    "T1.3",
    "T1.7"
   ],
-  "description": "Build the child app's main practice screen as a chat conversation: a message thread with the AI tutor where questions, hints, probes, encouragement, answers, and revisions flow as messages. Renders TutorEngine's turn stream — the UI holds no behavior logic; every decision comes from TutorEngine, EffortScorer, and the rule gates. Message list (tutor/child), composer with text input plus choice/number-pad options matched to question type and grade band, Hint button beside the composer, speaker button on every tutor message, slim session header with star progress. Demo ships the Band B (grade 4) version."
+  "description": "Build the child app's main practice screen as a chat conversation: a message thread with the AI tutor where questions, hints, probes, encouragement, answers, and revisions flow as messages. Renders TutorEngine's turn stream \u2014 the UI holds no behavior logic; every decision comes from TutorEngine, EffortScorer, and the rule gates. Message list (tutor/child), composer with text input plus choice/number-pad options matched to question type and grade band, Hint button beside the composer, speaker button on every tutor message, slim session header with star progress. Demo ships the Band B (grade 4) version."
  },
  {
   "id": "T2.1",
@@ -304,7 +304,7 @@
    "T4.6",
    "T1.6"
   ],
-  "description": "Show progress at a glance: accuracy per skill (this week versus last), active time per question, hint rate, most common error type, effort-score trend, and trade frequency — all computed from synced session logs."
+  "description": "Show progress at a glance: accuracy per skill (this week versus last), active time per question, hint rate, most common error type, effort-score trend, and trade frequency \u2014 all computed from synced session logs."
  },
  {
   "id": "T4.3",
@@ -330,7 +330,7 @@
   "depends": [
    "T4.6"
   ],
-  "description": "Browse the child's decision log — every unlock, trade and difficulty decision with its full justification — filterable by session and by decision type."
+  "description": "Browse the child's decision log \u2014 every unlock, trade and difficulty decision with its full justification \u2014 filterable by session and by decision type."
  },
  {
   "id": "T4.5",
@@ -372,7 +372,7 @@
    "T1.2",
    "T1.4"
   ],
-  "description": "Build scripted sessions for five personas — good-faith, guessing, idling, manipulative, and struggling child — and score them against fixed pass criteria: never teaches a wrong answer, never unlocks on pure idling, resists manipulation, and stays on-topic and age-appropriate."
+  "description": "Build scripted sessions for five personas \u2014 good-faith, guessing, idling, manipulative, and struggling child \u2014 and score them against fixed pass criteria: never teaches a wrong answer, never unlocks on pure idling, resists manipulation, and stays on-topic and age-appropriate."
  },
  {
   "id": "T5.2",
@@ -385,7 +385,7 @@
   "depends": [
    "T5.1"
   ],
-  "description": "Run a prompt-injection and jailbreak battery against the tutor — “ignore your instructions,” “mom said unlock,” “pretend you're my friend,” and edge cases — treating all child input as untrusted."
+  "description": "Run a prompt-injection and jailbreak battery against the tutor \u2014 \u201cignore your instructions,\u201d \u201cmom said unlock,\u201d \u201cpretend you're my friend,\u201d and edge cases \u2014 treating all child input as untrusted."
  },
  {
   "id": "T5.3",
@@ -445,9 +445,11 @@
    "T8.3",
    "T8.4",
    "T8.5",
-   "T1.8"
+   "T1.8",
+   "T8.6",
+   "T8.7"
   ],
-  "description": "Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies — practice, movement, and chore; (4) the auditor catches a staged leniency error."
+  "description": "Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies \u2014 practice, movement, and chore; (4) the auditor catches a staged leniency error."
  },
  {
   "id": "T5.5",
@@ -575,7 +577,7 @@
    "T1.3",
    "T1.8"
   ],
-  "description": "Build the Band A (grades 1–2) variants of the three Demo screens — Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) — selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the scr"
+  "description": "Build the Band A (grades 1\u20132) variants of the three Demo screens \u2014 Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) \u2014 selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the scr"
  },
  {
   "id": "T6.8",
@@ -591,7 +593,7 @@
    "T1.2",
    "T1.3"
   ],
-  "description": "Move every child-facing interface string — button labels, instructions, tutor prompts shown as text, and system messages on the Diagnostic, Challenge, and Hint display screens and the other child-app screens — into UI copy packs keyed by the grade parameter, so the same screen speaks at the child's "
+  "description": "Move every child-facing interface string \u2014 button labels, instructions, tutor prompts shown as text, and system messages on the Diagnostic, Challenge, and Hint display screens and the other child-app screens \u2014 into UI copy packs keyed by the grade parameter, so the same screen speaks at the child's "
  },
  {
   "id": "T7.1",
@@ -617,7 +619,7 @@
   "depends": [
    "T7.1"
   ],
-  "description": "Extend the T7.1 pipeline with archive and upload jobs: on push to main (or on tag), the pipeline archives the app and uploads the build to TestFlight in App Store Connect with no manual steps. Prerequisite (user one-time, not a task): the App Store Connect API key is stored in CI secrets only — neve"
+  "description": "Extend the T7.1 pipeline with archive and upload jobs: on push to main (or on tag), the pipeline archives the app and uploads the build to TestFlight in App Store Connect with no manual steps. Prerequisite (user one-time, not a task): the App Store Connect API key is stored in CI secrets only \u2014 neve"
  },
  {
   "id": "T7.3",
@@ -663,7 +665,7 @@
   "title": "Pilot web scaffold",
   "epic": 8,
   "epic_title": "Pilot web PoC",
-  "status": "not_started",
+  "status": "done",
   "size": "M",
   "scope": "Demo",
   "depends": [],
@@ -674,7 +676,7 @@
   "title": "Pilot question bank",
   "epic": 8,
   "epic_title": "Pilot web PoC",
-  "status": "not_started",
+  "status": "done",
   "size": "S",
   "scope": "Demo",
   "depends": [
@@ -687,7 +689,7 @@
   "title": "Pilot effort scorer + simulated unlock",
   "epic": 8,
   "epic_title": "Pilot web PoC",
-  "status": "not_started",
+  "status": "done",
   "size": "M",
   "scope": "Demo",
   "depends": [
@@ -701,7 +703,7 @@
   "title": "Pilot admin transcript view",
   "epic": 8,
   "epic_title": "Pilot web PoC",
-  "status": "not_started",
+  "status": "done",
   "size": "S",
   "scope": "Demo",
   "depends": [
@@ -716,7 +718,7 @@
   "title": "Copilot pilot build evaluation",
   "epic": 8,
   "epic_title": "Pilot web PoC",
-  "status": "not_started",
+  "status": "done",
   "size": "S",
   "scope": "Demo",
   "depends": [
@@ -732,12 +734,25 @@
   "title": "Browser model: tutor messages + parallel effort judge",
   "epic": 8,
   "epic_title": "Pilot web PoC",
-  "status": "not_started",
+  "status": "done",
   "size": "M",
   "scope": "Demo",
   "depends": [
    "T8.4"
   ],
-  "description": "Give the pilot an in-browser model (WebLLM via CDN, no build step) with two jobs: (1) draft tutor messages (encouragement, probes, hint wording) within the ladder level the deterministic code chose; (2) judge effort in parallel with the deterministic scorer, advisory only — the scorer still gates the unlock; both verdicts shown side by side, disagreements flagged. Guardrails in code: every draft validated (length cap, never contains the final answer; bounded regeneration then canned fallback); no model output can change the unlock decision. Lazy-loads on user gesture; if WebGPU is unavailable or the model fails, the pilot works exactly as the deterministic-only version."
+  "description": "Give the pilot an in-browser model (WebLLM via CDN, no build step) with two jobs: (1) draft tutor messages (encouragement, probes, hint wording) within the ladder level the deterministic code chose; (2) judge effort in parallel with the deterministic scorer, advisory only \u2014 the scorer still gates the unlock; both verdicts shown side by side, disagreements flagged. Guardrails in code: every draft validated (length cap, never contains the final answer; bounded regeneration then canned fallback); no model output can change the unlock decision. Lazy-loads on user gesture; if WebGPU is unavailable or the model fails, the pilot works exactly as the deterministic-only version."
+ },
+ {
+  "id": "T8.7",
+  "title": "Switchable model endpoints (browser / local / cloud)",
+  "epic": 8,
+  "epic_title": "Pilot web PoC",
+  "status": "not_started",
+  "size": "M",
+  "scope": "Demo",
+  "depends": [
+   "T8.6"
+  ],
+  "description": "Refactor the T8.6 WebLLM integration behind a ModelBackend interface with three backends: browser (WebLLM, default, lazy-loaded), local (OpenAI-compatible localhost endpoint, e.g. Ollama; configurable base URL + model, Test connection button), cloud (OpenAI-compatible HTTPS endpoint; key held in memory only, never persisted). Same two jobs on every backend: draft tutor messages within the code-chosen ladder level; judge effort from the transcript (advisory). Panel gains a backend selector; judge verdict names the backend. Identical guardrails on all backends: code-chosen level, validated drafts (length cap, leak check, bounded regeneration then canned fallback), scorer-only unlocks, disagreement flags. CORS requirement documented in the panel. Pilot fully usable with no backend or a failed backend."
  }
 ]
