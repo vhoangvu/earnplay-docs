@@ -5,19 +5,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EarnPlay pilot (web proof of concept)</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 1rem auto; padding: 0 1rem; color: #222; }
-  header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: .5rem; }
-  #question { font-size: 1.25rem; white-space: pre-line; margin: 1rem 0; }
-  input[type=text] { font-size: 1.1rem; padding: .4rem; width: 12rem; }
-  textarea { width: 100%; box-sizing: border-box; }
-  button { font-size: 1rem; padding: .4rem .9rem; margin: .25rem .25rem .25rem 0; }
-  .good { color: #0a7a2f; } .bad { color: #b3261e; }
-  #hints p { background: #fff7d6; padding: .5rem; border-radius: 4px; }
-  #decision.unlocked { background: #e3f6e8; } #decision.locked { background: #f3f3f3; }
-  #decision { padding: 1.5rem; border-radius: 8px; }
-  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
-  td, th { border: 1px solid #ccc; padding: .3rem; vertical-align: top; text-align: left; }
-  .note { color: #666; font-size: .85rem; }
+  :root {
+    --color-primary: #4361EE;
+    --color-secondary: #FFB703;
+    --color-background: #F7F8FC;
+    --color-surface: #FFFFFF;
+    --color-text: #1B1B2F;
+    --color-text-secondary: #6C6C80;
+    --color-success: #2EC4B6;
+    --color-warning: #FF9F1C;
+    --color-error: #E71D36;
+    --font-family-system: system-ui, sans-serif;
+    --font-size-title: 28px;
+    --font-size-headline: 20px;
+    --font-size-body: 17px;
+    --font-size-caption: 13px;
+    --font-weight-title: 700;
+    --font-weight-headline: 600;
+    --space-0: 0;
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-12: 12px;
+    --space-16: 16px;
+    --space-24: 24px;
+    --space-32: 32px;
+    --radius-card: 14px;
+    --radius-button: 10px;
+    --content-max-width: 42rem;
+    --answer-width: 12rem;
+    --size-full: 100%;
+    --border-width: 1px;
+    --disabled-opacity: 0.6;
+  }
+  body { font-family: var(--font-family-system); font-size: var(--font-size-body); max-width: var(--content-max-width); margin: var(--space-16) auto; padding: var(--space-0) var(--space-16); color: var(--color-text); background-color: var(--color-background); }
+  h1 { font-size: var(--font-size-title); font-weight: var(--font-weight-title); }
+  h2 { font-size: var(--font-size-headline); font-weight: var(--font-weight-headline); }
+  header { display: flex; justify-content: space-between; align-items: center; border-bottom: var(--border-width) solid var(--color-text-secondary); padding-bottom: var(--space-8); }
+  .question-card { font-size: var(--font-size-headline); font-weight: var(--font-weight-headline); white-space: pre-line; margin: var(--space-16) var(--space-0); padding: var(--space-16); border-radius: var(--radius-card); color: var(--color-text); background-color: var(--color-surface); }
+  input[type=text] { font: var(--font-size-body) var(--font-family-system); padding: var(--space-8); width: var(--answer-width); }
+  textarea { width: var(--size-full); box-sizing: border-box; }
+  button { box-sizing: border-box; font: var(--font-size-body) var(--font-family-system); padding: var(--space-8) var(--space-16); margin: var(--space-4) var(--space-4) var(--space-4) var(--space-0); border: var(--border-width) solid var(--color-primary); border-radius: var(--radius-button); color: var(--color-primary); background-color: var(--color-surface); }
+  button:disabled { opacity: var(--disabled-opacity); }
+  .primary-button { width: var(--size-full); color: var(--color-surface); background-color: var(--color-primary); }
+  .hint-button { color: var(--color-text); background-color: var(--color-secondary); border-color: var(--color-secondary); }
+  .hint-button::before { content: "💡"; margin-right: var(--space-4); }
+  .good { color: var(--color-success); } .bad { color: var(--color-error); }
+  #hints p { background-color: var(--color-secondary); color: var(--color-text); padding: var(--space-8); border-radius: var(--radius-button); }
+  [data-component="unlock-banner"].unlocked { background-color: var(--color-success); } [data-component="unlock-banner"].locked { background-color: var(--color-background); }
+  [data-component="unlock-banner"] { color: var(--color-text); padding: var(--space-16); border-radius: var(--radius-card); }
+  table { border-collapse: collapse; width: var(--size-full); font-size: var(--font-size-caption); }
+  td, th { border: var(--border-width) solid var(--color-text-secondary); padding: var(--space-4); vertical-align: top; text-align: left; }
+  .note { color: var(--color-text-secondary); font-size: var(--font-size-caption); }
 </style>
 </head>
 <body>
@@ -28,11 +66,11 @@
 
 <main id="screen-quiz">
   <p id="progress" class="note"></p>
-  <div id="question"></div>
+  <div id="question" class="question-card"></div>
   <form id="answer-form" autocomplete="off">
     <label for="answer">Your answer</label><br>
     <input type="text" id="answer" inputmode="decimal">
-    <button type="submit" id="submit-btn">Submit</button>
+    <button type="submit" id="submit-btn" class="primary-button">Submit</button>
     <div id="explain-wrap" hidden>
       <label for="explain">Why is it wrong? (optional)</label>
       <textarea id="explain" rows="2"></textarea>
@@ -40,7 +78,7 @@
   </form>
   <div id="feedback" role="status"></div>
   <div>
-    <button type="button" id="hint-btn">Hint</button>
+    <button type="button" id="hint-btn" class="hint-button">Hint</button>
     <button type="button" id="skip-btn">Skip</button>
     <button type="button" id="next-btn" hidden>Next question</button>
     <button type="button" id="finish-btn">Finish session</button>
@@ -49,7 +87,7 @@
 </main>
 
 <main id="screen-decision" hidden>
-  <div id="decision">
+  <div id="decision" data-component="unlock-banner">
     <h1 id="decision-title"></h1>
     <p id="decision-note" class="note"></p>
     <p id="decision-text"></p>
