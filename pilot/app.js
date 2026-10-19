@@ -151,6 +151,7 @@ function describeEvent(e) {
     case 'session_start': return 'Session started';
     case 'question_shown': return 'Question ' + e.number + ' shown (' + e.qid + ', ' + e.form + '): ' + e.text;
     case 'hint_opened': return 'Hint level ' + e.level + ' opened on ' + e.qid + ': ' + e.hintText;
+    case 'tutor_message': return 'Tutor message at ladder level ' + e.level + ' on ' + e.qid + ': ' + e.text;
     case 'revision': return 'Answer revised on ' + e.qid + ': "' + e.from + '" to "' + e.to + '"';
     case 'attempt':
       return 'Attempt on ' + e.qid + ': "' + e.answer + '" - ' + (e.correct ? 'correct' : 'incorrect') +
@@ -190,8 +191,15 @@ function parseAnswer(raw) {
 function containsAnswer(text, answer) {
   const expected = Number(answer);
   if (!Number.isFinite(expected)) return false;
-  const numbers = String(text).match(/[-+]?\d[\d,]*(?:\.\d+)?/g) || [];
-  return numbers.some(function (number) { return Number(number.replace(/,/g, '')) === expected; });
+  const numbers = String(text).match(/[-+]?\d[\d,]*(?:\.\d+)?(?:\s+\d{3})*/g) || [];
+  return numbers.some(function (number) { return Number(number.replace(/[,\s]/g, '')) === expected; });
+}
+
+function tutorPrompt(intent, question, attempts) {
+  return 'Write brief encouragement or a guiding probe at the ' + intent +
+    ' level only. Do not solve the whole problem or reveal the final answer.\nQuestion: ' +
+    question + '\nRecent attempts: ' + (attempts.join(', ') || 'none') +
+    '\nUse age-appropriate language. Return only the message.';
 }
 
 function validTutorDraft(draft, answer) {
@@ -205,7 +213,7 @@ async function draftTutorMessage(generate, prompt, answer, fallback) {
     try {
       const draft = await generate(request);
       if (validTutorDraft(draft, answer)) return draft.trim();
-      request = prompt + '\nRewrite the previous draft. Keep it under 300 characters and do not include the final answer.';
+      request = prompt + '\nThe previous draft was rejected. Rewrite it under 300 characters without the final answer.';
     } catch (_) {
       return fallback;
     }
@@ -242,7 +250,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     drawThreshold, createSession, touch, logEvent, recordAttempt, activeMs, effortSignals,
     effortPoints, evaluateSession, transcriptRows, signalsLine, parseAnswer, IDLE_PAUSE_MS,
-    containsAnswer, validTutorDraft, draftTutorMessage, parseJudgeResponse, compareJudge
+    containsAnswer, tutorPrompt, validTutorDraft, draftTutorMessage, parseJudgeResponse, compareJudge
   };
 }
 
@@ -252,7 +260,7 @@ if (typeof document !== 'undefined') {
   (function () {
     const $ = function (id) { return document.getElementById(id); };
     const REVISION_SETTLE_MS = 1200;
-    let session, index, hintLevel, snapshot, settleTimer, answered, lastTouch, modelReady = false;
+    let session, index, hintLevel, snapshot, settleTimer, answered, lastTouch, modelReady = false, tutorRequest = 0;
 
     function now() { return Date.now() - session.startAt; }
     function bump() {
@@ -277,6 +285,7 @@ if (typeof document !== 'undefined') {
 
     function showQuestion(i) {
       index = i;
+      tutorRequest++;
       hintLevel = 0;
       answered = false;
       snapshot = '';
@@ -324,9 +333,29 @@ if (typeof document !== 'undefined') {
         $('next-btn').textContent = index + 1 < QUESTIONS.length ? 'Next question' : 'Finish';
       } else {
         $('feedback').className = 'bad';
-        $('feedback').textContent = 'Not quite. Have another go!';
+        const canned = 'Not quite. Have another go!';
+        $('feedback').textContent = canned;
         snapshot = $('answer').value;
         $('answer').focus();
+        if (modelReady) {
+          const level = Math.max(1, hintLevel);
+          const intent = ['nudge', 'strategy', 'one worked step'][level - 1];
+          const attempts = session.events.filter(function (item) {
+            return item.qid === q.id && item.type === 'attempt';
+          }).map(function (item) { return item.answer; });
+          const event = logEvent(session, now(), 'tutor_message', {
+            qid: q.id, level: level, text: canned
+          });
+          const owner = session;
+          const requestId = ++tutorRequest;
+          draftTutorMessage(function (request) { return window.EarnPlayModel.generate(request, false); },
+            tutorPrompt(intent, q.text, attempts), q.answer, canned).then(function (text) {
+            if (owner === session && requestId === tutorRequest && !answered) {
+              $('feedback').textContent = text;
+              event.text = text;
+            }
+          });
+        }
       }
     }
 
@@ -346,13 +375,9 @@ if (typeof document !== 'undefined') {
         const attempts = session.events.filter(function (item) {
           return item.qid === q.id && item.type === 'attempt';
         }).map(function (item) { return item.answer; });
-        const prompt = 'Write one short, encouraging tutor message at the ' + ladderIntent +
-          ' level only. Do not solve the whole problem or reveal the final answer.\nQuestion: ' +
-          q.text + '\nRecent attempts: ' + (attempts.join(', ') || 'none') +
-          '\nUse age-appropriate language. Return only the message.';
         const owner = session;
         draftTutorMessage(function (request) { return window.EarnPlayModel.generate(request, false); },
-          prompt, q.answer, canned).then(function (text) {
+          tutorPrompt(ladderIntent, q.text, attempts), q.answer, canned).then(function (text) {
           if (owner === session && p.parentNode) {
             p.textContent = text;
             event.hintText = text;

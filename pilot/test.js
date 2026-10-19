@@ -136,6 +136,14 @@ test('T8.6 rejects answer-leaking tutor drafts and falls back to the canned line
   }, 'Tutor prompt', 86, fallback);
   assert.strictEqual(message, fallback);
   assert.strictEqual(attempts, 3);
+  assert.strictEqual(A.validTutorDraft('Try 1 000 next.', 1000), false);
+});
+
+test('T8.6 tutor prompt contains the code-chosen level, question, and recent attempts', () => {
+  const prompt = A.tutorPrompt('strategy', 'What is 8 times 7?', ['54', '56']);
+  assert(/strategy level only/.test(prompt));
+  assert(prompt.includes('What is 8 times 7?'));
+  assert(prompt.includes('Recent attempts: 54, 56'));
 });
 
 test('T8.6 scorer controls unlock when the model judge disagrees in both directions', () => {
