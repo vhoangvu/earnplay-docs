@@ -138,6 +138,14 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 
 - **Entitlement request status:** justification draft ready; NOT yet filed. Bundle ID and Team ID are placeholders until the project is created.
 
+## Tech stack \[SSOT-tech-stack\]
+
+- **iOS apps:** Swift + **SwiftUI** (picked over UIKit: faster to build for a 10-day deadline, FamilyActivityPicker is SwiftUI-native, concise declarative code for agents to generate). Xcode workspace with two app targets (child + admin) and one shared Swift package for models/schemas.
+- **Apple frameworks:** FamilyControls + ManagedSettings (shielding), MultipeerConnectivity (sync), CoreMotion (movement verification), AVSpeechSynthesizer (read-aloud).
+- **On-device model:** quantized Meta open-weights, llama.cpp/MLC-style route; runs on the device, no server.
+- **CI:** Xcode Cloud or GitHub Actions macOS runners.
+- **Pilot:** plain HTML/JS, no build step, no backend.
+
 ## 11. Canonical facts --- Scope \[SSOT-canonical-facts-scope\]
 
 - **Pilot (pre-kickoff, Demo scope):** a quick web-based proof of concept of the core tutor loop --- varied-form challenge questions, the 3-level hint ladder, deterministic effort scoring with the floor rule, a simulated unlock with justification, and an admin transcript view. Two jobs: validate the interaction design with a real child before the iOS build, and test coding-agent (Copilot) build performance on a small, well-specified feature. Web-only: no iOS, no FamilyControls/shields, no on-device model, no AI effort judgment, no trades, no sync. Throwaway code --- nothing from the pilot ships in the iOS app.
@@ -208,4 +216,6 @@ Which derived docs mirror which sections of this document.
   2026-10-18              T0.4 re-labeled v1-blocking (demo uses simulated-shield fallback); no Apple account or entitlement needed for the Nov 4 demo.                                                                                                 SSOT
 
   2026-10-18              Pilot section added: web PoC of the core tutor loop (validates the interaction design + tests Copilot build performance); HLD §10, LLD §14.1, Epic 8 (T8.1--T8.5, Demo scope); 49 tasks, 38 in the demo definition of done.   SSOT, HLD, LLD, Task Breakdown
+
+  2026-10-18              Tech stack section added: Swift + SwiftUI picked over UIKit (build speed, FamilyActivityPicker is SwiftUI-native, concise for agents); Xcode workspace + shared Swift package; Apple frameworks; quantized on-device model; CI options; pilot plain HTML/JS.                                                                                  SSOT
   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
