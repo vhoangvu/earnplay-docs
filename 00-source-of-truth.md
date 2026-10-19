@@ -52,6 +52,8 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 
 - **Platform:** iOS-only. Two apps: child app (AI tutor + app locker + challenge gate; enforces policy) and admin/parent app (dashboard, policy, decision log, audit; sets policy, enforces nothing directly).
 
+- **Child app main screen:** a conversational chat interface --- the child talks to the AI tutor in a message thread. Questions, hints, probes, encouragement, answers, and revisions all flow as chat messages; the chat is the main practice surface. The chat is the surface only: the hint ladder levels, the floor rule, the effort threshold, and the unlock decision are enforced in deterministic code --- the model can never reveal a full answer or grant an unlock through chat, and the child's free-text input is treated as untrusted (prompt-injection defense), per the assurance layers in section 8.
+
 - Grade is a content-level parameter; product target is grades 1--5 (two UX bands: 1--2 early readers, 3--5 fluent readers); the architecture is grade-agnostic --- new grades later mean new content packs, not redesign; the demo ships 4th-grade content only.
 
 ## 3. Canonical facts --- Locking model \[SSOT-canonical-facts-locking-model\]
@@ -225,4 +227,5 @@ Which derived docs mirror which sections of this document.
   2026-10-18              Source layout defined: iOS code repo (EarnPlay/, EarnPlayAdmin/, EarnPlayCore/, EarnPlayTests/); pilot at pilot/ in this repo (index.html, app.js, questions.js).                                                                                                                                               SSOT
 
   2026-10-19              Design system added (canonical palette hex values, typography, spacing, core components, single-theme-source rule); HLD gained a Design system usage section. Keeps UI code consistent across parallel agents/threads.                                                                                                                    SSOT, HLD
+  2026-10-19              Child app main screen is now a conversational chat interface (questions, hints, probes, answers as messages; chat is the surface only, safety-critical decisions stay in deterministic code). HLD Challenge screen rewritten as chat; kids-UX gained a session-script principle; LLD TutorEngine/ReadAloudService updated. New task T1.8 Chat conversation UI (Demo, M); T1.3/T1.7/T6.7 reworded; Demo definition of done 38 → 39 tasks (50 total).                                                                                                                    SSOT, HLD, LLD, Task Breakdown
   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

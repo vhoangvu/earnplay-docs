@@ -29,7 +29,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
   ------------------------------------ ----------------- ------------------------ --------------------------------------------------------------------------------------------------------------------------------
   0 --- Setup and long-lead items      T0.1--T0.4 (4)    3 / 1 / 0                Workspace, model runtime, solver, entitlement filing
 
-  1 --- Child app: tutor + challenge   T1.1--T1.7 (7)    7 / 0 / 0                Diagnostic, verified questions, hints, effort scoring, decision log, read-aloud
+  1 --- Child app: tutor + challenge   T1.1--T1.8 (8)    8 / 0 / 0                Diagnostic, verified questions, hints, effort scoring, decision log, read-aloud, chat UI
 
   2 --- Locking                        T2.1--T2.5 (5)    5 / 0 / 0                Policy store, shields, setup flow, simulated fallback, default-deny
 
@@ -45,7 +45,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   8 --- Pilot web PoC                  T8.1--T8.5 (5)    5 / 0 / 0                Web proof of concept of the core loop; validates the interaction design and tests coding-agent build performance
 
-  **Total**                            **49 tasks**      **38 / 6 / 5**           **Demo is the definition of done for the hackathon**
+  **Total**                            **50 tasks**      **39 / 6 / 5**           **Demo is the definition of done for the hackathon**
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Reading a task block:** Every task gives its ID and title, what to build, a verifiable acceptance line, its dependencies, its size, and its scope tag. Work a task only when its dependencies are done --- the dependency line is the gate, not a suggestion.
@@ -178,7 +178,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 > **Inputs:** T1.2 verified current problem (values + solver answer); three-level hint templates (nudge, strategy, one worked step).
 >
-> **Outputs:** Hint ladder UI for the current problem; HintEvent log records (level shown, timestamp, whether the next answer changed).
+> **Outputs:** Hint delivery as tutor messages in the chat thread (one ladder level per Hint tap); HintEvent log records (level shown, timestamp, whether the next answer changed).
 >
 > **Automated test:** XCTest: for 10 fixture problems, request hints 1-3 in order; assert each hint\'s worked step arithmetically matches the solver\'s answer for that problem\'s values, and a HintEvent is written per level. Pass: 10/10 content matches, 30 events logged.
 >
@@ -246,19 +246,37 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 **Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.1
 
-**What to build:** Build the ReadAloudService for the child app: on-device text-to-speech only (the system\'s built-in speech, for example AVSpeechSynthesizer --- no network call, no downloaded voice), behind one reusable speaker-button component for question, hint, and instruction views (the Diagnostic, Challenge, and Hint display views from T1.1--T1.3). The grade parameter selects the behaviour: in Band A (grades 1--2) reading starts automatically when a question, hint, or instruction appears; in Band B (grades 3--5, including the demo\'s grade 4) the button is always present and the child taps it to hear the text. Starting a new item or leaving the view stops the current reading. When a hint is read aloud, emit a hint-listen event for the EffortScorer (T1.4), so Band A effort scoring can weight hint-listens.
+**What to build:** Build the ReadAloudService for the child app: on-device text-to-speech only (the system\'s built-in speech, for example AVSpeechSynthesizer --- no network call, no downloaded voice), behind one reusable speaker-button component attached to every tutor message in the chat thread (questions, hints, and instructions from T1.1--T1.3 all arrive as tutor messages). The grade parameter selects the behaviour: in Band A (grades 1--2) reading starts automatically when a tutor message appears; in Band B (grades 3--5, including the demo\'s grade 4) the button is always present and the child taps it to hear the text. Starting a new item or leaving the view stops the current reading. When a hint is read aloud, emit a hint-listen event for the EffortScorer (T1.4), so Band A effort scoring can weight hint-listens.
 
-> **Inputs:** T0.1 workspace and shared package; the grade parameter and its band (LLD data schemas --- demo grade \'4\' is Band B; grades 1--2 are Band A); question, hint, and instruction text supplied by the T1.1--T1.3 views; the system\'s on-device text-to-speech (AVSpeechSynthesizer).
+> **Inputs:** T0.1 workspace and shared package; the grade parameter and its band (LLD data schemas --- demo grade \'4\' is Band B; grades 1--2 are Band A); tutor message text supplied by the T1.1--T1.3 flows; the system\'s on-device text-to-speech (AVSpeechSynthesizer).
 >
-> **Outputs:** ReadAloudService module in the child app; one reusable speaker-button component used by question, hint, and instruction views; auto-read rule keyed to the grade band; a hint-listen event emitted to T1.4 when a hint is read aloud.
+> **Outputs:** ReadAloudService module in the child app; one reusable speaker-button component used on every tutor message; auto-read rule keyed to the grade band; a hint-listen event emitted to T1.4 when a hint is read aloud.
 >
-> **Automated test:** XCTest with a stubbed speech engine and a URLSession mock: (a) speak(text) is called with the exact view text for a question, a hint, and an instruction; (b) network call count is 0 in all cases; (c) with a Band A grade fixture, presenting a view triggers speak automatically, and with a Band B fixture it does not; (d) dismissing the view calls stop; (e) playing a hint writes exactly one hint-listen event. Pass: all assertions hold.
+> **Automated test:** XCTest with a stubbed speech engine and a URLSession mock: (a) speak(text) is called with the exact message text for a question message, a hint message, and an instruction message; (b) network call count is 0 in all cases; (c) with a Band A grade fixture, a new tutor message triggers speak automatically, and with a Band B fixture it does not; (d) leaving the chat calls stop; (e) playing a hint writes exactly one hint-listen event. Pass: all assertions hold.
 >
-> **Manual test:** 1) Put the iPhone in Airplane Mode. 2) Open a question and tap the speaker button --- the question is read aloud, matching the on-screen text. 3) Request a hint and tap its speaker button --- the hint is read, and the effort/debug view shows a hint-listen recorded. 4) Set the grade to 2 (Band A) in the debug/profile settings, open a new question --- reading starts on its own, with no tap. 5) Set the grade back to 4, open a question --- nothing is read until the button is tapped. 6) Start a reading and navigate away mid-sentence --- speech stops.
+> **Manual test:** 1) Put the iPhone in Airplane Mode. 2) Open the chat and tap a tutor message\'s speaker button --- the message is read aloud, matching the on-screen text. 3) Request a hint and tap its speaker button --- the hint is read, and the effort/debug view shows a hint-listen recorded. 4) Set the grade to 2 (Band A) in the debug/profile settings, start a session --- each tutor message is read on its own, with no tap. 5) Set the grade back to 4, start a session --- nothing is read until the button is tapped. 6) Start a reading and leave the chat mid-sentence --- speech stops.
 >
-> **✓ Acceptance criteria:** In Airplane Mode, tapping the speaker button on a question, a hint, and an instruction reads exactly that view\'s text aloud with no network call; with the grade set to a Band A grade, reading starts automatically on appearance, and with a Band B grade it does not start until the button is tapped; navigating away stops the reading. No reading path may require a network connection or a downloaded voice: a build that prompts to download a voice, or fails silently in Airplane Mode, fails acceptance.
+> **✓ Acceptance criteria:** In Airplane Mode, tapping the speaker button on a question message, a hint message, and an instruction message reads exactly that message\'s text aloud with no network call; with the grade set to a Band A grade, reading starts automatically on appearance, and with a Band B grade it does not start until the button is tapped; leaving the chat stops the reading. No reading path may require a network connection or a downloaded voice: a build that prompts to download a voice, or fails silently in Airplane Mode, fails acceptance.
 >
 > **References:** HLD-grade-bands; HLD-kids-ux-principles; LLD-readaloudservice; SSOT-canonical-facts-identity
+
+### T1.8 --- Chat conversation UI \[TASKS-t1-8-chat-conversation-ui\]
+
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T1.2, T1.3, T1.7
+
+**What to build:** The child app's main practice screen as a chat conversation: a message thread with the AI tutor where questions, hints, probes, encouragement, answers, and revisions flow as messages. Renders TutorEngine's turn stream --- the UI holds no behavior logic; every decision comes from TutorEngine, EffortScorer, and the rule gates. Message list (tutor/child), composer with text input plus choice/number-pad options matched to question type and grade band, Hint button beside the composer, speaker button on every tutor message (T1.7), slim session header with star progress. Demo ships the Band B (grade 4) version.
+
+> **Inputs:** T1.2 verified questions; T1.3 hint ladder levels; T1.7 speaker-button component; TutorEngine turn stream (LLD); chat screen description (HLD); design system tokens (SSOT).
+>
+> **Outputs:** Chat thread UI in the child app: message list, composer, per-message speaker buttons, Hint button, session header; turn rendering only, no decision logic.
+>
+> **Automated test:** XCTest: drive a scripted turn stream (question → wrong answer → encouragement → hint → probe → revision) through the view; assert messages render in thread order, every tutor message carries a speaker button, and no numeric score is displayed anywhere. Pass: order matches the stream; 0 scores visible.
+>
+> **Manual test:** 1) Start a practice session --- the chat opens with the tutor's first question as a message. 2) Answer wrong --- the tutor's encouragement arrives as a message; no failure state. 3) Tap Hint --- the nudge arrives as a tutor message in the thread. 4) Tap a speaker button --- the message is read aloud. Expected: the whole session happens in the thread; nothing looks like a quiz form.
+>
+> **✓ Acceptance criteria:** A practice session runs end-to-end in the chat thread: questions, hints, probes, encouragement, and answers all appear as messages in order; every tutor message has a working speaker button; the Hint button is always visible beside the composer; no scores, timers, countdowns, or pass/fail language appear. Band B (grade 4) layout per the HLD.
+>
+> **References:** SSOT-canonical-facts-identity; SSOT-tech-stack; HLD-screen-inventory; HLD-key-screen-descriptions; HLD-kids-ux-principles; HLD-grade-bands; LLD-tutorengine; LLD-readaloudservice
 
 ## Epic 2 --- Locking \[TASKS-epic-2-locking\]
 
@@ -610,7 +628,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T5.4 --- Demo staging \[TASKS-t5-4-demo-staging\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.3, T4.4, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.2, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.3, T4.4, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.2, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5
 
 **What to build:** Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies --- practice, movement, and chore; (4) the auditor catches a staged leniency error.
 
@@ -760,11 +778,11 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T6.7 --- Band A screen variants \[TASKS-t6-7-band-a-screen-variants\]
 
-**Size:** M --- about half a day • **Scope:** v1 • **Depends on:** T1.7, T1.1, T1.2, T1.3
+**Size:** M --- about half a day • **Scope:** v1 • **Depends on:** T1.7, T1.1, T1.2, T1.3, T1.8
 
-**What to build:** Build the Band A (grades 1--2) variants of the three Demo screens --- Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) --- selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the screen except where a question truly needs it; tap targets are larger than the 44-point minimum that binds every screen; each screen holds fewer elements at once (one question, one tutor line, one input, one primary action); the visual tone is the playful Band A theme (larger type and artwork, rounder presentation, generous spacing); sessions use the shorter Band A default length; and read-aloud auto-starts through the T1.7 infrastructure. Band B behaviour is unchanged.
+**What to build:** Build the Band A (grades 1--2) variants of the three Demo screens --- Diagnostic (T1.1), Challenge (T1.8), and Hint display (T1.3) --- selected by the grade parameter. They are variants of the same screens, not new screens: answers are tap-to-choose with picture options and the keyboard stays off the screen except where a question truly needs it; tap targets are larger than the 44-point minimum that binds every screen; each screen holds fewer elements at once (one question, one tutor line, one input, one primary action); the visual tone is the playful Band A theme (larger type and artwork, rounder presentation, generous spacing); sessions use the shorter Band A default length; and read-aloud auto-starts through the T1.7 infrastructure. Band B behaviour is unchanged.
 
-> **Inputs:** T1.7 ReadAloudService and speaker-button component; the Demo Diagnostic (T1.1), Challenge (T1.2), and Hint display (T1.3) screens; the grade parameter selecting Band A (grades 1--2) versus Band B (grades 3--5); the Band A rules from the HLD UX section (tap-to-choose/picture answers, minimal keyboard, playful tone, larger targets, sparser density, shorter sessions).
+> **Inputs:** T1.7 ReadAloudService and speaker-button component; the Demo Diagnostic (T1.1), Challenge (T1.8), and Hint display (T1.3) screens; the grade parameter selecting Band A (grades 1--2) versus Band B (grades 3--5); the Band A rules from the HLD UX section (tap-to-choose/picture answers, minimal keyboard, playful tone, larger targets, sparser density, shorter sessions).
 >
 > **Outputs:** Band A variants of the Diagnostic, Challenge, and Hint display screens, rendered from the same screen code selected by the grade parameter (no forked duplicate screens); Band A theme (type/artwork scale and spacing) applied by the band, not per screen.
 >
@@ -1007,14 +1025,14 @@ The chains that matter most. If a task on the left slips, everything to its righ
 
   **CI/CD and release**               T0.1 Workspace → T7.1 CI pipeline → T7.2 TestFlight upload → T7.5 On-device verification; T7.1 → T7.3 Versioning; T7.2 → T7.4 Submission prep (v1)
 
-  **Grade-adaptive UX**               T0.1 Scaffolding → T1.7 Read-aloud (Demo); T1.7 + T1.1 / T1.2 / T1.3 Demo screens → T6.7 Band A variants (v1), T6.8 Copy packs (v1)
+  **Grade-adaptive UX**               T0.1 Scaffolding → T1.7 Read-aloud (Demo); T1.7 + T1.1 / T1.8 / T1.3 Demo screens → T6.7 Band A variants (v1), T6.8 Copy packs (v1)
 
   **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation (pre-kickoff validation; informs Epic 1)
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Demo definition of done --- 38 tasks \[TASKS-demo-definition-of-done-33-tasks\]
+## Demo definition of done --- 39 tasks \[TASKS-demo-definition-of-done-33-tasks\]
 
-**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.3, T4.4, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.2, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5.
+**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.3, T4.4, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.2, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5.
 
 Held back until Demo is green: T0.4 (v1), T3.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
 

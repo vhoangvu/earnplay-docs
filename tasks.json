@@ -143,6 +143,21 @@
   "description": "Build the ReadAloudService for the child app: on-device text-to-speech only (the system's built-in speech, for example AVSpeechSynthesizer — no network call, no downloaded voice), behind one reusable speaker-button component for question, hint, and instruction views (the Diagnostic, Challenge, and H"
  },
  {
+  "id": "T1.8",
+  "title": "Chat conversation UI",
+  "epic": 1,
+  "epic_title": "Child app: tutor + challenge",
+  "status": "not_started",
+  "size": "M",
+  "scope": "Demo",
+  "depends": [
+   "T1.2",
+   "T1.3",
+   "T1.7"
+  ],
+  "description": "Build the child app's main practice screen as a chat conversation: a message thread with the AI tutor where questions, hints, probes, encouragement, answers, and revisions flow as messages. Renders TutorEngine's turn stream — the UI holds no behavior logic; every decision comes from TutorEngine, EffortScorer, and the rule gates. Message list (tutor/child), composer with text input plus choice/number-pad options matched to question type and grade band, Hint button beside the composer, speaker button on every tutor message, slim session header with star progress. Demo ships the Band B (grade 4) version."
+ },
+ {
   "id": "T2.1",
   "title": "Policy store",
   "epic": 2,
