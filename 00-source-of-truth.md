@@ -20,7 +20,7 @@ This section is the mechanism: how sync works across all EarnPlay documents.
 >
 > **3. Rule 3:** Impact tracing --- before editing, list every LLD module/section and every build task the change touches, including indirect ones (new modules, algorithm variants, new tasks). The checker catches drift (names, IDs, phrases, references) but NOT completeness --- it cannot know that a new concept implies a new module or new tasks. If unsure whether a change is derived-doc-only detail or a shared concept, treat it as shared and trace its impact.
 >
-> **4. Rule 4:** Run the checker script (check_docs.py) after propagation. Fix until it reports green. References in the task breakdown cite section IDs, never section numbers; the checker also verifies every cited ID exists.
+> **4. Rule 4:** Run the checker script (check_md_pack.py) for the Markdown pack after propagation. Fix until it reports green. (check_docs.py checks the .docx sources only.) References in the task breakdown cite section IDs, never section numbers; the checker also verifies every cited ID exists.
 >
 > **5. Rule 5:** Log every change in the Changelog with the date, what changed, and which docs were updated.
 
