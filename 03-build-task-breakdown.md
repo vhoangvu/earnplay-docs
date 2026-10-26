@@ -11,13 +11,13 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **How to use this document**                                                                                                                                                                                                                                                                                                                                                                                                           |
 |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (41 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
+| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (38 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
 +========================================================================================================================================================================================================================================================================================================================================================================================================================================+
 
 +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Critical path --- read before starting**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| 1\) The entitlement filing (T0.4) is v1-blocking, not demo-critical: the demo runs on the simulated-shield fallback (T2.4) and needs nothing from Apple, but TestFlight / App Store (v1) requires the approved distribution entitlement --- file early and v1 is unblocked; file late and v1 waits on Apple\'s manual review. • 2) Solver before question generation (T0.3 → T1.2): nothing generates questions until answers can be verified deterministically. • 3) Policy store before shields and the policy editor (T2.1 → T2.2, T4.1). • 4) Sync before dashboard, transcript and auditor (T4.6 → T4.2, T4.3, T4.4, T4.5). The admin app has nothing to show until logs arrive. |
+| 1\) The entitlement filing (T0.4) is v1-blocking, not demo-critical: the demo runs on the simulated-shield fallback (T2.4) and needs nothing from Apple, but TestFlight / App Store (v1) requires the approved distribution entitlement --- file early and v1 is unblocked; file late and v1 waits on Apple\'s manual review. • 2) Solver before question generation (T0.3 → T1.2): nothing generates questions until answers can be verified deterministically. • 3) Policy store before shields and the policy editor (T2.1 → T2.2, T4.1). • 4) Sync before dashboard and auditor (T4.6 → T4.2, T4.5; T4.3/T4.4 transcript and decision-log viewers are v1). The admin app has nothing to show until logs arrive. |
 +=======================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
 
 ## At a glance \[TASKS-at-a-glance\]
@@ -35,17 +35,17 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   3 --- Trades                         T3.1--T3.4 (4)    3 / 1 / 0                Movement trade, chore trade, offer logic; photo-proof in v1
 
-  4 --- Admin app                      T4.1--T4.6 (6)    6 / 0 / 0                Policy editor, dashboard, transcripts, decision log, auditor, sync
+  4 --- Admin app                      T4.1--T4.6 (6)    4 / 2 / 0                Policy editor, dashboard, transcripts, decision log, auditor, sync
 
   5 --- Assurance, demo, submission    T5.1--T5.5 (5)    5 / 0 / 0                Eval harness, red-teaming, versioning, demo staging, submission
 
   6 --- v1 hardening                   T6.1--T6.8 (8)    0 / 3 / 5                App Store path first; Band A screen variants and grade-banded copy packs in v1; multi-child, speech, curriculum and more later
 
-  7 --- CI/CD and release automation   T7.1--T7.5 (5)    4 / 1 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification; App Store submission prep in v1
+  7 --- CI/CD and release automation   T7.1--T7.5 (5)    3 / 2 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification; App Store submission prep in v1
 
   8 --- Pilot web PoC                  T8.1--T8.7 (7)    7 / 0 / 0                Web proof of concept of the core loop + switchable model backends (browser / local / cloud; tutor messages, parallel effort judge); validates the interaction design and tests coding-agent build performance
 
-  **Total**                            **52 tasks**      **41 / 6 / 5**           **Demo is the definition of done for the hackathon**
+  **Total**                            **52 tasks**      **38 / 9 / 5**           **Demo is the definition of done for the hackathon**
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Reading a task block:** Every task gives its ID and title, what to build, a verifiable acceptance line, its dependencies, its size, and its scope tag. Work a task only when its dependencies are done --- the dependency line is the gate, not a suggestion.
@@ -96,17 +96,17 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 **Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.1
 
-**What to build:** Build the deterministic verifier for 4th-grade skills: multiplication facts to 12×12, multi-digit multiplication, division, fraction comparison and addition, and word problems. The solver is plain code --- the model never grades its own answers.
+**What to build:** Build the deterministic verifier for 4th-grade skills: multiplication facts to 12×12, multi-digit multiplication, division, fraction comparison and addition, and word problems. For reading questions, verify the answer against the passage text (LLD solver-contract step 3): the answer must be supported by the passage the child will read. The solver is plain code --- the model never grades its own answers.
 
-> **Inputs:** T0.1 shared package; the 4th-grade skill list from the LLD (multiplication to 12x12, multi-digit multiplication, division, fraction compare/add, word problems); a hand-computed 50-problem test bank with expected answers.
+> **Inputs:** T0.1 shared package; the 4th-grade skill list from the LLD (multiplication to 12x12, multi-digit multiplication, division, fraction compare/add, word problems; reading items verified against passage text); a hand-computed 50-problem test bank with expected answers, plus a passage fixture set for reading items.
 >
-> **Outputs:** Solver service (pure Swift, no model dependency) exposing verify(skill, values, answer) -\> Bool; the 50-problem bank as a test fixture.
+> **Outputs:** Solver service (pure Swift, no model dependency) exposing verify(skill, values, answer) -\> Bool, plus passage verification for reading items (answer supported by passage text, else rejected); the 50-problem bank as a test fixture, plus the passage fixture set.
 >
-> **Automated test:** XCTest: run all 50 bank problems through the solver; assert 50/50 agreement with hand-computed answers, plus 20 deliberately wrong answers all rejected. Pass: 70/70 assertions pass. Add a property test: 500 random multiplication pairs checked against Swift integer arithmetic --- 0 mismatches.
+> **Automated test:** XCTest: run all 50 bank problems through the solver; assert 50/50 agreement with hand-computed answers, plus 20 deliberately wrong answers all rejected. Pass: 70/70 assertions pass. Add a property test: 500 random multiplication pairs checked against Swift integer arithmetic --- 0 mismatches. Add a passage test: 10 reading items with passages --- supported answers pass, answers not supported by the passage are rejected.
 >
 > **Manual test:** 1) Open the solver debug screen (or playground). Enter 37 x 48 --- solver shows 1776. 2) Enter a wrong answer (1775) --- solver marks it incorrect. 3) Try a fraction case: 1/2 + 1/4 --- solver shows 3/4. Expected: all three match hand calculation.
 >
-> **✓ Acceptance criteria:** The solver verifies answers for a 50-problem test bank with 100% agreement to hand-computed answers. The bank covers every listed skill at least 5 times; a skill with no bank coverage fails acceptance.
+> **✓ Acceptance criteria:** The solver verifies answers for a 50-problem test bank with 100% agreement to hand-computed answers. The bank covers every listed skill at least 5 times; a skill with no bank coverage fails acceptance. Reading items pass only when their answers are supported by their passage text.
 >
 > **References:** SSOT-canonical-facts-questions-and-hints; SSOT-canonical-facts-model-behavior-assurance-six-layers; HLD-ai-design; LLD-data-schemas; LLD-solver-contract; APP-technical-approach; ENT-child-safety
 
@@ -182,7 +182,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **Automated test:** XCTest: for 10 fixture problems, request hints 1-3 in order; assert each hint\'s worked step arithmetically matches the solver\'s answer for that problem\'s values, and a HintEvent is written per level. Pass: 10/10 content matches, 30 events logged.
 >
-> **Manual test:** 1) Start a question, tap Hint once --- a nudge appears that does not give the answer. 2) Tap again --- a strategy hint appears. 3) Tap a third time --- one worked step appears, still not the full final answer unless the LLD allows it at level 3. 4) Change your answer --- return to the session log/debug view and confirm the hint-\>changed-answer flag is set.
+> **Manual test:** 1) Start a question, tap Hint once --- a nudge appears that does not give the answer. 2) Tap again --- a strategy hint appears. 3) Tap a third time --- one worked step appears, still not the full final answer. 4) Change your answer --- return to the session log/debug view and confirm the hint-\>changed-answer flag is set.
 >
 > **✓ Acceptance criteria:** Each level shows correct content for the current problem; hint events are logged, including hint → changed-answer. A fourth hint request shows no new level and logs no duplicate event.
 >
@@ -202,7 +202,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **Manual test:** 1) Play a session answering wrong but revising and using a hint --- after sustained effort, unlock is granted and the narration names an observed effort (e.g., revisions/hint), not generic praise. 2) Start a session and put the phone down for the full window --- no unlock, and returning shows no progress credited for idle time. 3) Repeat the trying session --- the effort needed feels different from run 1 (variable threshold), not identical every time.
 >
-> **✓ Acceptance criteria:** Scripted sessions score as expected: a genuinely trying session passes even with wrong answers; an idling session fails. Signal weights are grade-aware: in Band A (grades 1--2) the score weights retries, hint-listens, and attempts, and a missing or short verbal explanation is never counted against the child; in Band B (grades 3--5) verbal explanations are weighed alongside retries, hint use, attempts, and revisions. Both scripted outcomes are reproducible from the test fixtures; a scorer change that breaks either fixture fails acceptance.
+> **✓ Acceptance criteria:** Scripted sessions score as expected: a genuinely trying session passes even with wrong answers; an idling session fails. Signal weights are Band B (grades 3--5): verbal explanations are weighed alongside retries, hint use, attempts, and revisions. (Band A weights are v1 scope, owned by the grade-adaptive epic T6.7/T6.8.) Both scripted outcomes are reproducible from the test fixtures; a scorer change that breaks either fixture fails acceptance.
 >
 > **References:** SSOT-canonical-facts-effort-model; HLD-challenge-timed-unlock-and-re-lock; LLD-effort-scoring-algorithm; APP-how-it-works; ENT-child-safety
 
@@ -246,17 +246,17 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 **Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.1
 
-**What to build:** Build the ReadAloudService for the child app: on-device text-to-speech only (the system\'s built-in speech, for example AVSpeechSynthesizer --- no network call, no downloaded voice), behind one reusable speaker-button component attached to every tutor message in the chat thread (questions, hints, and instructions from T1.1--T1.3 all arrive as tutor messages). The grade parameter selects the behaviour: in Band A (grades 1--2) reading starts automatically when a tutor message appears; in Band B (grades 3--5, including the demo\'s grade 4) the button is always present and the child taps it to hear the text. Starting a new item or leaving the view stops the current reading. When a hint is read aloud, emit a hint-listen event for the EffortScorer (T1.4), so Band A effort scoring can weight hint-listens.
+**What to build:** Build the ReadAloudService for the child app: on-device text-to-speech only (the system\'s built-in speech, for example AVSpeechSynthesizer --- no network call, no downloaded voice), behind one reusable speaker-button component attached to every tutor message in the chat thread (questions, hints, and instructions from T1.1--T1.3 all arrive as tutor messages). Demo scope is the button + TTS path exercised on Band B (grades 3--5, including the demo\'s grade 4): the button is always present and the child taps it to hear the text. Band A auto-read (reading starts automatically when a tutor message appears) is v1 scope (T6.7). Starting a new item or leaving the view stops the current reading. When a hint is read aloud, emit a hint-listen event for the EffortScorer (T1.4).
 
 > **Inputs:** T0.1 workspace and shared package; the grade parameter and its band (LLD data schemas --- demo grade \'4\' is Band B; grades 1--2 are Band A); tutor message text supplied by the T1.1--T1.3 flows; the system\'s on-device text-to-speech (AVSpeechSynthesizer).
 >
-> **Outputs:** ReadAloudService module in the child app; one reusable speaker-button component used on every tutor message; auto-read rule keyed to the grade band; a hint-listen event emitted to T1.4 when a hint is read aloud.
+> **Outputs:** ReadAloudService module in the child app; one reusable speaker-button component used on every tutor message; a hint-listen event emitted to T1.4 when a hint is read aloud. (The grade-band auto-read rule is v1 scope, T6.7; Demo builds the button + TTS path only.)
 >
-> **Automated test:** XCTest with a stubbed speech engine and a URLSession mock: (a) speak(text) is called with the exact message text for a question message, a hint message, and an instruction message; (b) network call count is 0 in all cases; (c) with a Band A grade fixture, a new tutor message triggers speak automatically, and with a Band B fixture it does not; (d) leaving the chat calls stop; (e) playing a hint writes exactly one hint-listen event. Pass: all assertions hold.
+> **Automated test:** XCTest with a stubbed speech engine and a URLSession mock: (a) speak(text) is called with the exact message text for a question message, a hint message, and an instruction message; (b) network call count is 0 in all cases; (c) with a Band B fixture, a new tutor message does not trigger speak until tapped (Band A auto-start is v1, T6.7); (d) leaving the chat calls stop; (e) playing a hint writes exactly one hint-listen event. Pass: all assertions hold.
 >
-> **Manual test:** 1) Put the iPhone in Airplane Mode. 2) Open the chat and tap a tutor message\'s speaker button --- the message is read aloud, matching the on-screen text. 3) Request a hint and tap its speaker button --- the hint is read, and the effort/debug view shows a hint-listen recorded. 4) Set the grade to 2 (Band A) in the debug/profile settings, start a session --- each tutor message is read on its own, with no tap. 5) Set the grade back to 4, start a session --- nothing is read until the button is tapped. 6) Start a reading and leave the chat mid-sentence --- speech stops.
+> **Manual test:** 1) Put the iPhone in Airplane Mode. 2) Open the chat and tap a tutor message\'s speaker button --- the message is read aloud, matching the on-screen text. 3) Request a hint and tap its speaker button --- the hint is read, and the effort/debug view shows a hint-listen recorded. 4) Set the grade to 2 (Band A) in the debug/profile settings, start a session --- nothing is read until the button is tapped in Demo (Band A auto-read is v1, T6.7). 5) Set the grade back to 4, start a session --- nothing is read until the button is tapped. 6) Start a reading and leave the chat mid-sentence --- speech stops.
 >
-> **✓ Acceptance criteria:** In Airplane Mode, tapping the speaker button on a question message, a hint message, and an instruction message reads exactly that message\'s text aloud with no network call; with the grade set to a Band A grade, reading starts automatically on appearance, and with a Band B grade it does not start until the button is tapped; leaving the chat stops the reading. No reading path may require a network connection or a downloaded voice: a build that prompts to download a voice, or fails silently in Airplane Mode, fails acceptance.
+> **✓ Acceptance criteria:** In Airplane Mode, tapping the speaker button on a question message, a hint message, and an instruction message reads exactly that message\'s text aloud with no network call; with a Band B grade, reading does not start until the button is tapped (Band A auto-start on appearance is v1 scope, T6.7); leaving the chat stops the reading. No reading path may require a network connection or a downloaded voice: a build that prompts to download a voice, or fails silently in Airplane Mode, fails acceptance.
 >
 > **References:** HLD-grade-bands; HLD-kids-ux-principles; LLD-readaloudservice; SSOT-canonical-facts-identity
 
@@ -304,11 +304,11 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T2.2 --- Shield manager \[TASKS-t2-2-shield-manager\]
 
-**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.4, T2.1
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T2.1
 
 **What to build:** Apply and remove ManagedSettings shields from policy, enumeration-first: shield every app except the allowlist, using the apps enumerated via FamilyActivityPicker at setup (see T2.3), with category shields as a backstop for newly installed apps that are not yet enumerated. Do not rely on a per-app exemption overriding a category shield. Run unlock timers on a monotonic clock (system uptime, not wall-clock time) so changing the device clock cannot extend an unlock. Re-lock automatically on expiry, and re-evaluate any open unlock window after a restart. The on-device prototype for this approach is confirmation-only --- verify that enumeration works on device; do not gate the architecture on it. Caveat: absence from public docs is not proof; only the on-device prototype settles it for certain.
 
-> **Inputs:** T0.4 development entitlement, T2.1 PolicyStore; ManagedSettings/FamilyControls APIs; the enumerated app list and allowlist from FamilyActivityPicker at setup (T2.3); unlock durations from policy.
+> **Inputs:** T2.1 PolicyStore; ManagedSettings/FamilyControls APIs (real-shield path, v1 — the development entitlement is a v1 input, not a Demo gate); the enumerated app list and allowlist from FamilyActivityPicker at setup (T2.3); unlock durations from policy. Demo verification runs against the T2.4 simulated shield interface.
 >
 > **Outputs:** ShieldManager that applies/removes shields per policy, enumeration-first --- every enumerated app except the allowlist is shielded, with category shields as a backstop for newly installed apps not yet enumerated; monotonic-clock (system uptime) unlock timer; re-lock on expiry and re-evaluation of open windows after restart.
 >
@@ -462,7 +462,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 **Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T0.1, T2.1
 
-**What to build:** Edit every policy field: always-allowed apps, the unblockable list, never-unlockable overrides, unlock durations, caps, the chore pool (chore, unlock minutes, expiry, verification mode), and movement-trade settings. Saving bumps the policy version and queues it for sync.
+**What to build:** Edit every policy field: always-allowed apps, the unblockable list, never-unlockable overrides, unlock durations, caps, the chore pool (chore, unlock minutes, expiry, weekly cap, verification mode), and movement-trade settings. Saving bumps the policy version and queues it for sync.
 
 > **Inputs:** Policy schema from T2.1 (shared package); T0.1 admin target; chore-pool and movement settings fields from the LLD.
 >
@@ -496,9 +496,9 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T4.3 --- Transcript viewer \[TASKS-t4-3-transcript-viewer\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T4.6
+**Size:** S --- under 2 hours • **Scope:** v1 • **Depends on:** T4.6
 
-**What to build:** Open any session and read the full transcript: questions asked, the child\'s attempts, hints given, and timestamps.
+**What to build:** Open any session and read the full transcript: questions asked, the child\'s attempts, hints given, and timestamps. (v1 — the full, browsable transcript viewer. The Demo shows only the transcript excerpt attached to the staged auditor flag, via T4.5.)
 
 > **Inputs:** T4.6 synced SessionLogs with full transcripts (questions, attempts, hints, timestamps).
 >
@@ -514,9 +514,9 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T4.4 --- Decision log viewer \[TASKS-t4-4-decision-log-viewer\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T4.6
+**Size:** S --- under 2 hours • **Scope:** v1 • **Depends on:** T4.6
 
-**What to build:** Browse the child\'s decision log --- every unlock, trade and difficulty decision with its full justification --- filterable by session and by decision type.
+**What to build:** Browse the child\'s decision log --- every unlock, trade and difficulty decision with its full justification --- filterable by session and by decision type. (v1 — the full decision log viewer. The Demo shows only the justification attached to the staged auditor flag, via T4.5.)
 
 > **Inputs:** T4.6 synced Decision records from T1.6 (full justification fields).
 >
@@ -532,11 +532,11 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T4.5 --- Auditor engine \[TASKS-t4-5-auditor-engine\]
 
-**Size:** L --- about a full day • **Scope:** Demo • **Depends on:** T4.3, T4.4
+**Size:** L --- about a full day • **Scope:** Demo • **Depends on:** T1.6, T4.6
 
 **What to build:** Run a second, separate on-device auditor over session logs with seven checks: leniency drift, false negatives (trying hard but denied), gaming patterns, question-quality and difficulty miscalibration, behavior shifts, inconsistency, and justifications that do not match the raw log. Each flag carries severity, evidence, and a suggested action. The parent can dismiss or act on a flag; the auditor never changes policy on its own.
 
-> **Inputs:** T4.3 transcripts, T4.4 decision records; the seven auditor checks and flag format (severity, evidence, suggested action) from the LLD; a second on-device model/runtime (T0.2).
+> **Inputs:** T1.6 Decision records and synced session excerpts (via T4.6); the seven auditor checks and flag format (severity, evidence, suggested action) from the LLD; an admin-app auditor runtime instance built within this task, distinct from the child-app tutor runtime (T0.2). (Full T4.3 transcripts and T4.4 decision records are v1 inputs.)
 >
 > **Outputs:** Auditor engine running at sync on the parent device; flag list with severity, evidence, and suggested action; parent dismiss/act actions (auditor never edits policy itself).
 >
@@ -544,7 +544,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **Manual test:** 1) Stage the demo leniency session (T5.4 moment 4) and sync. 2) Run the auditor --- a leniency flag appears. 3) Open it --- severity, the specific evidence (session/values), and a suggested action are shown. 4) Dismiss the flag --- it clears and the policy is unchanged. Expected: the auditor flagged and advised only; it changed nothing by itself.
 >
-> **✓ Acceptance criteria:** Staged sessions produce the expected flags, each with severity, evidence, and a suggested action. Every flag\'s evidence cites a concrete session and field value that the parent can open and verify in T4.3/T4.4.
+> **✓ Acceptance criteria:** Staged sessions produce the expected flags, each with severity, evidence, and a suggested action. Every flag\'s evidence cites a concrete session and field value that the parent can open and verify in the staged flag detail (session excerpt + justification shown with the flag; full T4.3/T4.4 viewers are v1).
 >
 > **References:** SSOT-canonical-facts-audit-and-justification; SSOT-canonical-facts-model-behavior-assurance-six-layers; HLD-ai-design; LLD-auditflag; LLD-the-seven-checks; APP-how-it-works; ENT-child-safety
 
@@ -552,9 +552,9 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 **Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T2.1, T1.6
 
-**What to build:** Connect the two apps with MultipeerConnectivity over Bluetooth and local Wi-Fi. PolicyUpdate flows down to the child app; SessionLog flows up to the admin app. Handle versioning, queue messages while disconnected, and retry until delivered. Sync works when both apps are open and nearby.
+**What to build:** Connect the two apps with MultipeerConnectivity over Bluetooth only. PolicyUpdate flows down to the child app; SessionLog flows up to the admin app. Handle versioning, queue messages while disconnected, and retry until delivered. Sync works when both apps are open and nearby.
 
-> **Inputs:** T2.1 policy versioning, T1.6 Decision/SessionLog schemas; MultipeerConnectivity (Bluetooth + local Wi-Fi); both apps open and nearby.
+> **Inputs:** T2.1 policy versioning, T1.6 Decision/SessionLog schemas; MultipeerConnectivity (Bluetooth only); both apps open and nearby.
 >
 > **Outputs:** Sync engine: PolicyUpdate down (admin -\> child), SessionLog up (child -\> admin); offline queue with retry-until-delivered; version-conflict handling (newer wins).
 >
@@ -562,7 +562,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **Manual test:** 1) Change a policy value in the admin app with both apps open nearby --- within seconds the child debug view shows it. 2) Run a session on the child --- sync --- the session appears in the admin list. 3) Turn on Airplane Mode on the child, run another session, turn Airplane Mode off with both apps open --- the queued session arrives without re-running anything, and appears once, not twice.
 >
-> **✓ Acceptance criteria:** A policy change on the admin reaches the child; session logs reach the admin; the offline queue drains on reconnect. Sync requires no account, server, or internet connection --- the manual test is run with internet disabled on both devices (local Wi-Fi/Bluetooth only).
+> **✓ Acceptance criteria:** A policy change on the admin reaches the child; session logs reach the admin; the offline queue drains on reconnect. Sync requires no account, server, or internet connection --- the manual test is run with internet disabled on both devices (Bluetooth only).
 >
 > **References:** SSOT-canonical-facts-privacy; HLD-sync-and-audit; HLD-privacy-and-security-principles; LLD-sync-protocol; LLD-conflict-resolution-and-retry; APP-technical-approach; ENT-privacy-and-data-handling
 
@@ -628,7 +628,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T5.4 --- Demo staging \[TASKS-t5-4-demo-staging\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.3, T4.4, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.2, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7
 
 **What to build:** Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies --- practice, movement, and chore; (4) the auditor catches a staged leniency error.
 
@@ -838,9 +838,9 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T7.2 --- Automated archive and TestFlight upload \[TASKS-t7-2-automated-archive-and-testflight-upload\]
 
-**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T7.1
+**Size:** M --- about half a day • **Scope:** v1 • **Depends on:** T7.1
 
-**What to build:** Extend the T7.1 pipeline with archive and upload jobs: on push to main (or on tag), the pipeline archives the app and uploads the build to TestFlight in App Store Connect with no manual steps. Prerequisite (user one-time, not a task): the App Store Connect API key is stored in CI secrets only --- never in the repo --- and the distribution entitlement (T0.4) is approved.
+**What to build:** Extend the T7.1 pipeline with archive and upload jobs: on push to main (or on tag), the pipeline archives the app and uploads the build to TestFlight in App Store Connect with no manual steps. Prerequisite (user one-time, not a task): the App Store Connect API key is stored in CI secrets only --- never in the repo --- and the distribution entitlement (T0.4) is approved. (v1 — not in the Demo definition of done; the Demo pipeline is T7.1 build+test only.)
 
 > **Inputs:** T7.1 pipeline; App Store Connect API key (user-provided, CI secrets only, never in repo); approved distribution entitlement (T0.4).
 >
@@ -892,19 +892,19 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T7.5 --- On-device release verification \[TASKS-t7-5-on-device-release-verification\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T7.2
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T7.1
 
-**What to build:** Manual task, user. Install the T7.2 TestFlight build on the user\'s iPhone (Screen Time + FamilyControls authorized) and verify every demo moment on the real device, recording a pass/fail verification report per moment.
+**What to build:** Manual task, user. Install the current dev build on the user\'s iPhone and verify every demo moment on the real device, recording a pass/fail verification report per moment. (TestFlight verification is v1, with T7.2; Demo verification uses a local/dev build, with simulated shields where real shields are unavailable.)
 
-> **Inputs:** T7.2 TestFlight build; user\'s iPhone with Screen Time + FamilyControls authorization.
+> **Inputs:** Current dev build (from T7.1); user\'s iPhone (Screen Time + FamilyControls authorization only where real shields are being verified).
 >
 > **Outputs:** Verification report (pass/fail per demo moment on the real device).
 >
 > **Automated test:** N/A --- on-device verification is manual.
 >
-> **Manual test:** 1) Install the TestFlight build on the user\'s iPhone and complete Screen Time + FamilyControls authorization. 2) Run the demo moments on device: diagnostic -\> challenge -\> shield -\> timed unlock -\> re-lock; movement trade; chore trade; auditor flag. Expected: each moment passes on device. 3) Record pass/fail per moment in the verification report; for any failure, file a bug with steps to reproduce.
+> **Manual test:** 1) Install the current dev build on the user\'s iPhone (complete Screen Time + FamilyControls authorization only if real shields are being verified). 2) Run the demo moments on device: diagnostic -\> challenge -\> shield -\> timed unlock -\> re-lock; movement trade; chore trade; auditor flag. Expected: each moment passes on device. 3) Record pass/fail per moment in the verification report; for any failure, file a bug with steps to reproduce.
 >
-> **✓ Acceptance criteria:** All demo moments pass on the real device via TestFlight; any failure filed as a bug with steps to reproduce. Verification on a simulator does not satisfy this task --- every moment must pass on the real device via the TestFlight build.
+> **✓ Acceptance criteria:** All demo moments pass on the real device via the dev build; any failure filed as a bug with steps to reproduce. Verification on a simulator does not satisfy this task --- every moment must pass on the real device.
 >
 > **References:** SSOT-ci-cd-and-release; HLD-ci-cd-and-release-process; LLD-ci-cd-pipeline; LLD-demo-mapping-real-vs-simulated-in-the-10-day-demo
 
@@ -1047,7 +1047,7 @@ The chains that matter most. If a task on the left slips, everything to its righ
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   **Chain**                           **Sequence**
   ----------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------
-  **Entitlement**                     T0.4 → T2.2 (real shields) → T6.1 (App Store)
+  **Entitlement**                     T0.4 → real shields in T2.2 (v1 path) → T6.1 (App Store); Demo shield path is T2.4 simulated
 
   **Verification**                    T0.3 Solver → T1.2 Generation loop → T1.3 Hints, T1.4 Effort, T5.1 Eval harness
 
@@ -1055,21 +1055,21 @@ The chains that matter most. If a task on the left slips, everything to its righ
 
   **Policy**                          T2.1 Policy store → T2.2 Shields, T2.3 Setup, T4.1 Editor, T4.6 Sync
 
-  **Admin visibility**                T4.6 Sync → T4.2 Dashboard, T4.3 Transcripts, T4.4 Decision log → T4.5 Auditor
+  **Admin visibility**                T4.6 Sync → T4.2 Dashboard, T4.5 Auditor (T4.3 Transcripts, T4.4 Decision log are v1; Demo shows the excerpt + justification on the staged flag)
 
   **Demo**                            All Demo tasks → T5.4 Demo staging → T5.5 Submission (Nov 4, 9:00 PM ET)
 
-  **CI/CD and release**               T0.1 Workspace → T7.1 CI pipeline → T7.2 TestFlight upload → T7.5 On-device verification; T7.1 → T7.3 Versioning; T7.2 → T7.4 Submission prep (v1)
+  **CI/CD and release**               T0.1 Workspace → T7.1 CI pipeline (Demo) → T7.2 TestFlight upload (v1) → T7.4 Submission prep (v1); T7.1 → T7.3 Versioning; T7.5 On-device verification (Demo, via dev build)
 
   **Grade-adaptive UX**               T0.1 Scaffolding → T1.7 Read-aloud (Demo); T1.7 + T1.1 / T1.8 / T1.3 Demo screens → T6.7 Band A variants (v1), T6.8 Copy packs (v1)
 
   **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation; T8.4 → T8.6 Browser model → T8.7 Switchable endpoints (pre-kickoff validation; informs Epic 1)
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Demo definition of done --- 41 tasks \[TASKS-demo-definition-of-done-33-tasks\]
+## Demo definition of done --- 38 tasks \[TASKS-demo-definition-of-done-33-tasks\]
 
-**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.3, T4.4, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.2, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
+**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
 
-Held back until Demo is green: T0.4 (v1), T3.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
+Held back until Demo is green: T0.4 (v1), T3.4 (v1), T4.3 (v1), T4.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.2 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
 
 Epic 8 is pre-kickoff validation, sequenced before Epic 0: it validates the interaction design and the agent workflow before the iOS build starts.
