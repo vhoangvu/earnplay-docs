@@ -522,7 +522,7 @@ EarnPlay is built and released through an automated pipeline, so builds are prod
 
 ## The CI pipeline \[HLD-the-ci-pipeline\]
 
-On every push, CI --- Xcode Cloud, which includes 25 free build hours/month with the Apple Developer Program, or GitHub Actions macOS runners --- builds the project, runs the test suite, archives, and uploads to TestFlight automatically, so no manual building is needed.
+On every push, CI --- Xcode Cloud or GitHub Actions macOS runners --- builds the project, runs the test suite, archives, and uploads to TestFlight automatically, so no manual building is needed.
 
 ## Division of responsibility \[HLD-division-of-responsibility\]
 
