@@ -4,7 +4,7 @@
 
 # Purpose
 
-Start the EarnPlay build on its critical path. T0.1 → T0.4 comes first because Apple's entitlement review runs on Apple's clock --- it takes days to weeks and cannot be rushed. Everything else in the build can wait for the hackathon window; this filing cannot.
+Start the EarnPlay build on its critical path. T0.1 → T0.4 comes first because Apple's entitlement review runs on Apple's clock --- it takes days to weeks and cannot be rushed. (The urgency is v1/TestFlight lead time; the demo itself runs on the simulated-shield fallback and needs nothing from Apple.) Everything else in the build can wait for the hackathon window; this filing cannot.
 
   ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   **Rule:** Use a PERSONAL Apple ID for everything in this checklist --- Xcode, enrollment, and the entitlement filing. Never a work Apple ID. EarnPlay is a personal project.
@@ -68,7 +68,7 @@ Start the EarnPlay build on its critical path. T0.1 → T0.4 comes first because
 
 # C --- T0.4 Entitlement filing
 
-*Size S · Scope: Demo · Depends on: T0.1 (Section A) and enrollment (Section B)*
+*Size S · Scope: v1 · Depends on: T0.1 (Section A) and enrollment (Section B)*
 
 > **\[ \]** Fill every placeholder in the prepared Entitlement Justification draft:
 >
