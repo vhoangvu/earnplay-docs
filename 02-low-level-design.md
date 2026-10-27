@@ -786,9 +786,9 @@ Workflow definition. The pipeline is defined in a CI workflow file --- ci.yml fo
 >
 > 2\. **Test ---** xcodebuild test.
 >
-> 3\. **Archive ---** xcodebuild archive.
+> 3\. **Archive (v1, T7.2) ---** xcodebuild archive.
 >
-> 4\. **Upload ---** upload to TestFlight through the App Store Connect API, via xcrun altool or an equivalent upload tool.
+> 4\. **Upload (v1, T7.2) ---** upload to TestFlight through the App Store Connect API, via xcrun altool or an equivalent upload tool.
 
 - **Secrets ---** the App Store Connect API key is provided by the user and stored in CI secrets only. It is never committed to the repo, and no secrets of any kind appear in source.
 
