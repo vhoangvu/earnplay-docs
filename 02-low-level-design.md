@@ -72,7 +72,7 @@ Responsibility: Loads and runs the quantized on-device model, builds prompts fro
 
 ### ReadAloudService \[LLD-readaloudservice\]
 
-Responsibility: Speaks child-facing text aloud, entirely on-device, so a child who cannot yet read a question, hint, or instruction can still hear it. It wraps AVSpeechSynthesizer and makes no network calls --- speech is generated on the device, consistent with the rule that no child data leaves the device. Inputs: the text to speak (a question, a hint, or an instruction supplied by TutorEngine) and the session's grade band, derived from the grade parameter in Section 2. Outputs: spoken audio, plus stop and replay for the current utterance. UI hooks: every tutor message in the chat thread carries the service's speaker button --- in Band B the child taps the button to hear the text; in Band A the service starts reading automatically when the message appears (auto-read), and the button replays it. A completed hint playback is surfaced to EffortScorer and StallingDetector as a hint-listen signal (weighted in Section 3.5). Scope: Demo --- the read-aloud infrastructure, including the Band A auto-read behaviour, is Demo scope per the High-Level Design; the demo exercises it on Band B (grade 4) screens, and the Band A screen variants that use it are v1. Dependencies: called by TutorEngine only; it reads no stored state and writes no records.
+Responsibility: Speaks child-facing text aloud, entirely on-device, so a child who cannot yet read a question, hint, or instruction can still hear it. It wraps AVSpeechSynthesizer and makes no network calls --- speech is generated on the device, consistent with the rule that no child data leaves the device. Inputs: the text to speak (a question, a hint, or an instruction supplied by TutorEngine) and the session's grade band, derived from the grade parameter in Section 2. Outputs: spoken audio, plus stop and replay for the current utterance. UI hooks: every tutor message in the chat thread carries the service's speaker button --- in Band B the child taps the button to hear the text; in Band A (v1 scope) the service starts reading automatically when the message appears (auto-read), and the button replays it. A completed hint playback is surfaced to EffortScorer and StallingDetector as a hint-listen signal (weighted in Section 3.5). Scope: Demo --- the read-aloud infrastructure (the speaker button and on-device text-to-speech) is Demo scope; the demo exercises it on Band B (grade 4) screens. Band A auto-read behaviour (reading starts automatically when the message appears) is v1 scope, per the HLD grade-band note; the Band A screen variants that use it are v1. Dependencies: called by TutorEngine only; it reads no stored state and writes no records.
 
 ## 1.2 Admin (parent) app modules \[LLD-admin-parent-app-modules\]
 
@@ -150,6 +150,8 @@ Authored in the admin app, versioned, and cached on the child device. The child 
   unlockMinutes           Int                     Unlock minutes earned when the chore is completed and confirmed.
 
   expiry                  Timestamp               Offer is not usable after this time.
+
+    weeklyCap               Int                     Parent-set weekly cap for this chore (per-entry cap, SSOT-chore-trade).
 
   verificationMode        Enum                    parent-confirm or photo-async (photo proof, unlock granted, parent reviews later and can revoke).
   ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -448,6 +450,8 @@ Because answers come from the solver and not from the model, a model error canno
 >
 > 7\. Attempt correctness is always judged against verifiedAnswer. Model text that contradicts verifiedAnswer in feedback or hints is a validation failure under Section 10 and is regenerated or replaced.
 
+Demo content for the solver (from T0.3/T1.1, recorded here so those tasks' "from the LLD" inputs hold): the 4th-grade skill list is multiplication facts to 12x12, multi-digit multiplication, division, fraction comparison and addition, and word problems, plus reading items whose answers are verified against their passage text (step 3 above). The diagnostic item set is 10 minutes across facts fluency, fractions, word problems, reading fluency, and comprehension.
+
 # 6. Shield manager \[LLD-shield-manager\]
 
 ![Figure 3 --- Shield unlock and re-lock sequence: the grant Decision is logged first, the shield is removed for the Policy duration measured on the monotonic clock, and the shield is re-applied at expiry.](media/media/image3.png){width="6.9in" height="6.0in"}
@@ -546,7 +550,7 @@ Optional asynchronous mode (verificationMode = photo-async). The child attaches 
 
 ![Figure 5 --- Sync protocol sequence: PolicyUpdate down (admin → child) and SessionLog up (child → admin), with monotonic versioning, queued retry in creation order, and delivery by receipt.](media/media/image5.png){width="6.9in" height="6.2in"}
 
-**Transport: MultipeerConnectivity (Bluetooth and local Wi-Fi). Owner modules: SyncService in both apps.**
+**Transport: MultipeerConnectivity (Bluetooth only). Owner modules: SyncService in both apps.**
 
 Properties of the transport. The session is encrypted and needs no pairing codes. Sync works when both apps are open and the devices are nearby; iOS will not keep MultipeerConnectivity alive in the background, so no design element may depend on background sync. The child app is fully functional between syncs on its cached Policy, and logs accumulate on the child device until they can be sent.
 
