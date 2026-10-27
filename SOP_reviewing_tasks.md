@@ -73,3 +73,29 @@ produces the evidence: keep the review notes — they are the grading input.
 - "The report is complete but I disagree with an ambiguous decision." → If the card
   allows the reading, it passes; note the disagreement for the doc backlog. If the
   card does not allow it, fail it under section 5.
+
+
+## 8. Requesting a Copilot review with related docs
+
+When Copilot is asked to review a PR, the request must carry the docs Copilot needs. By default Copilot sees only the PR title, body, diff, and linked issue. Links alone are not enough: paste the key excerpts inline, because Copilot may not follow links into another private repo.
+
+### 8.1 New PRs: Review context section in the PR body
+
+Every PR body carries a Review context section with, in order:
+
+1. The linked issue (via `Closes #N`) and its acceptance criteria.
+2. The task card's References (section IDs) plus links to the earnplay-docs files on main (00, 01, 02, 03 as the task touches them).
+3. Key excerpts inline: the SSOT/HLD/LLD passages the diff must match (identity, scope, architecture, module map). Only the passages the task touches, not whole docs.
+4. Local + CI results: what ran, what passed.
+5. An explicit check list: what to verify, placeholders/assumptions flagged, unverified items named (e.g. a physical-device run deferred to a human checkpoint).
+6. The closing line: "Post any new findings as review comments; if nothing new, say so."
+
+### 8.2 Already-open PRs: @copilot comment
+
+If the PR is already open without a Review context section, post the same content as an @copilot comment asking for a re-review.
+
+### 8.3 Request mechanics and caveats
+
+- Request Copilot as reviewer from the PR's Reviewers sidebar. Balanced effort was used for PR #32.
+- An @copilot comment in a PR may go through GitHub's agent-prompt flow ("Start new session"): a Copilot agent session may start and may push changes. Hold the merge until the session's activity (comments, commits, new PRs) is known and re-checked: CI green on the latest commit, no new blocking findings.
+- A review flag about an item the plan defers to a human checkpoint (e.g. a physical-device run) is not a code failure; say so in the grade, do not treat it as blocking.
