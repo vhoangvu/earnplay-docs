@@ -470,7 +470,7 @@ Four demo moments carry the argument, and the demo is built so each one can be s
 
 - **Auditor catches an error.** the auditor catches a staged leniency error --- a planted too-generous decision is flagged with evidence in the admin app.
 
-- **CI pipeline --- Demo scope:** Set up during the demo build so every push builds, tests, archives, and uploads to TestFlight automatically (see Section 11).
+- **CI pipeline --- Demo scope:** Set up during the demo build so every push builds and tests automatically (see Section 11). Archive and TestFlight upload automation is v1 (T7.2).
 
 ## Pilot --- web proof of concept \[HLD-pilot-web-proof-of-concept\]
 
@@ -522,7 +522,7 @@ EarnPlay is built and released through an automated pipeline, so builds are prod
 
 ## The CI pipeline \[HLD-the-ci-pipeline\]
 
-On every push, CI --- Xcode Cloud or GitHub Actions macOS runners --- builds the project, runs the test suite, archives, and uploads to TestFlight automatically, so no manual building is needed.
+On every push, CI --- Xcode Cloud or GitHub Actions macOS runners --- builds the project and runs the test suite automatically (Demo), so no manual building is needed; archiving and uploading to TestFlight automatically is v1 (T7.2).
 
 ## Division of responsibility \[HLD-division-of-responsibility\]
 
