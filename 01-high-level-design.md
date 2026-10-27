@@ -496,7 +496,7 @@ Success criteria: (1) a child who tries hard earns the simulated unlock despite 
 
 Throwaway code: nothing from the pilot ships in the iOS app. It validates the interaction design and the agent workflow, then it is done. How its pieces map to the LLD modules is stated in LLD Section 14.1.
 
-Sequencing: pre-kickoff validation, sequenced before Epic 0. It informs the demo; it is not a submission gate, but it is Demo scope and part of the 41-task definition of done.
+Sequencing: pre-kickoff validation, sequenced before Epic 0. It informs the demo; it is not a submission gate, but it is Demo scope and part of the 38-task definition of done.
 
 ## Version 1 \[HLD-version-1\]
 
