@@ -126,7 +126,7 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 
 ## 9. Canonical facts --- Privacy \[SSOT-canonical-facts-privacy\]
 
-- No network calls at practice time. No accounts. No child data off-device. Session logs sync between the two apps over Bluetooth via MultipeerConnectivity only. FamilyControls tokens are opaque (app never learns installed apps beyond parent picks). No ads, analytics SDKs, data sale, or third-party tracking. The app does not request the child\'s name, age, or personal info beyond what the parent enters for policy.
+- No network calls at practice time. The one-time first-launch model download (see [SSOT-tech-stack]) is not practice time; after a successful download, practice is fully offline. No accounts. No child data off-device. Session logs sync between the two apps over Bluetooth via MultipeerConnectivity only. FamilyControls tokens are opaque (app never learns installed apps beyond parent picks). No ads, analytics SDKs, data sale, or third-party tracking. The app does not request the child\'s name, age, or personal info beyond what the parent enters for policy.
 
 ## 10. Canonical facts --- Platform and entitlement \[SSOT-canonical-facts-platform-and-entitlement\]
 
@@ -144,7 +144,7 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 
 - **iOS apps:** Swift + **SwiftUI** (picked over UIKit: faster to build for a 10-day deadline, FamilyActivityPicker is SwiftUI-native, concise declarative code for agents to generate). Xcode workspace with two app targets (child + admin) and one shared Swift package for models/schemas.
 - **Apple frameworks:** FamilyControls + ManagedSettings (shielding), MultipeerConnectivity (sync), CoreMotion (movement verification), AVSpeechSynthesizer (read-aloud).
-- **On-device model:** quantized Meta open-weights, llama.cpp/MLC-style route; runs on the device, no server.
+- **On-device model and distribution (decided 2026-10-29; code-repo tracking issue vhoangvu/earnplay#53):** bartowski Llama-3.2-1B-Instruct-GGUF, Q4_K_M (807,694,464 bytes), llama.cpp/MLC-style route; runs on the device, no server. The model is NOT bundled in the app. On first launch, over Wi-Fi, the app downloads the model file to Application Support (NOT Caches --- iOS can purge Caches under storage pressure), verifies the sha256 checksum after download (checksum beginning 6f85a640), and discards and retries on mismatch; an unverified model is never run. The download shows progress with retry on failure; after a successful download the app works fully offline. The downloaded file is picked up by the existing ModelRuntime lookup, with Application Support joining the lookup order. Llama 3.2 Community License attribution is in the app, on an About screen. Explicitly NOT: bundling the model in the app binary, on-demand resources (rejected for purge risk), or shrinking the quant (Q4_K_M is already 4-bit). Purpose: defensive App Store publish, with a review submission target of Oct 31--Nov 2, 2026, before the repo goes public at the Nov 4 submission. The hackathon submission itself is unaffected: the fresh-extract repo includes the setup script and lookup logic.
 - **CI:** Xcode Cloud or GitHub Actions macOS runners.
 - **Pilot:** plain HTML/JS, no build step, no backend.
 - **Source layout (iOS code repo, when created):** `EarnPlay/` (child app target), `EarnPlayAdmin/` (admin app target), `EarnPlayCore/` (shared Swift package: models, schemas, solver), `EarnPlayTests/` (test targets).
@@ -234,3 +234,5 @@ Which derived docs mirror which sections of this document.
   2026-10-26              Re-review fix: archive/TestFlight upload automation scoped to v1 (T7.2) in SSOT scope + CI sections, HLD demo moments + CI section, LLD §15 jobs tagged v1; Demo pipeline is build+test only (T7.1); tasks.json T5.4 depends order normalized to 03.   SSOT, HLD, LLD, Task Breakdown  
   2026-10-27              Review-request format documented: how to ask Copilot to review a PR with related docs (Review context section in the PR body, @copilot comment for already-open PRs, Start-new-session caveat).   SOP_reviewing_tasks  
   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2026-10-29              Model distribution decided (code-repo issue vhoangvu/earnplay#53): first-launch Wi-Fi download to Application Support, not bundled and not on-demand resources, sha256-verified; SSOT, HLD, LLD
