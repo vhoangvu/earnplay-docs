@@ -68,7 +68,7 @@ Responsibility: Writes an immutable Decision record for every consequential deci
 
 ### ModelRuntime (child app) \[LLD-modelruntime-child-app\]
 
-Responsibility: Loads and runs the quantized on-device model, builds prompts from the fixed structure in Section 10, validates structured output, and enforces bounded regeneration with a safe fallback. Inputs: session context (skill profile, transcript, effort state) and the task for the current turn. Outputs: validated structured output (tutor text, hint, probe, or a proposed decision with justification fields), or a fallback response when validation fails after the retry bound.
+Responsibility: Loads and runs the quantized on-device model from the first-launch download in [LLD-model-integration] (Application Support joins the lookup order; an unverified model is never run), builds prompts from the fixed structure in Section 10, validates structured output, and enforces bounded regeneration with a safe fallback. Inputs: session context (skill profile, transcript, effort state) and the task for the current turn. Outputs: validated structured output (tutor text, hint, probe, or a proposed decision with justification fields), or a fallback response when validation fails after the retry bound.
 
 ### ReadAloudService \[LLD-readaloudservice\]
 
@@ -614,7 +614,7 @@ Inputs: synced session logs, Decision records, and Decision justifications. The 
 
 # 10. Model integration \[LLD-model-integration\]
 
-**Runtime: quantized open-weights model running fully on-device (llama.cpp / MLC-style runtime). Owner module: ModelRuntime in each app.**
+**Runtime: bartowski Llama-3.2-1B-Instruct-GGUF, Q4_K_M (807,694,464 bytes), running fully on-device (llama.cpp / MLC-style runtime), decided 2026-10-29 (code-repo tracking issue vhoangvu/earnplay#53; see [SSOT-tech-stack]). Distribution: the tutor model is NOT bundled in the child app; on first launch, over Wi-Fi, the child app downloads the model file to Application Support (NOT Caches --- iOS can purge Caches under storage pressure), verifies the sha256 checksum after download (checksum beginning 6f85a640), and discards and retries on mismatch; an unverified model is never run. The download shows progress with retry on failure; after a successful download the app works fully offline. The downloaded file is picked up by the existing ModelRuntime lookup in [LLD-modelruntime-child-app], with Application Support joining the lookup order. Llama 3.2 Community License attribution is in the app, on an About screen. Explicitly NOT: bundling the model in the app binary, on-demand resources (rejected for purge risk), or shrinking the quant (Q4_K_M is already 4-bit). Owner module: ModelRuntime in each app.**
 
 The tutor model is never trusted alone --- deterministic code holds every safety-critical decision.
 
@@ -667,7 +667,7 @@ On any gate failure, the output is regenerated with a bounded retry count. After
 
   Bluetooth off or unavailable                         Sync queues and retries at the next opportunity. The child app keeps enforcing the cached Policy and keeps logging; nothing about enforcement depends on the admin app being reachable.
 
-  Model failure or invalid output                      Bounded regeneration, then the safe fallback question or neutral fallback turn (Sections 5 and 10). The session continues.
+  Model failure or invalid output                      Bounded regeneration, then the safe fallback question or neutral fallback turn (Sections 5 and 10). The session continues. A failed or checksum-mismatched model download is discarded and retried (see [LLD-model-integration]); an unverified model is never run.
 
   Shield apply or remove failure                       Retry the operation, log the failure as a Decision-adjacent event in the session log, and surface it in the admin app at the next sync.
 
@@ -726,7 +726,7 @@ Scripted sessions simulate five child personas end to end through TutorEngine, E
 
 # 13. Storage and retention \[LLD-storage-and-retention\]
 
-- **Local only ---** All data --- policies, sessions, transcripts, decisions, flags, chore offers, and photo proof --- is stored locally on the device that holds it. There is no cloud storage in v1.
+- **Local only ---** All data --- policies, sessions, transcripts, decisions, flags, chore offers, and photo proof --- is stored locally on the device that holds it. There is no cloud storage in v1. The downloaded tutor model file (see [LLD-model-integration]) is likewise stored locally, in Application Support, and is not subject to transcript retention.
 
 - **Protection ---** stored logs are protected with iOS Data Protection at rest.
 
