@@ -126,6 +126,7 @@ EarnPlay is organized in four layers. The child app and the admin app each conta
   Sync (child side)                   Exchanges policy down and logs up with the admin app over Bluetooth when both apps are open and nearby.
 
   Decision Logger                     Records every significant decision with its evidence, reasoning, alternative considered, and confidence.
+  SessionRecorder                     During a practice session, records per-question practice detail and the session effort snapshot  into the SessionLog and hands it to the existing sync queue. It invents nothing: a question not practised produces no record, and a session with no score carries nil effort.
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Admin app components \[HLD-admin-app-components\]
@@ -192,7 +193,7 @@ A chore trade uses the same AI-initiated moment as the movement trade, but the o
 
 ### 5.5 Sync and audit \[HLD-sync-and-audit\]
 
-When both apps are open and the devices are nearby, the two Sync components connect over Bluetooth and exchange in both directions: new policy moves down from admin to child, and new session logs, transcripts, and decision justifications move up from child to admin. The child app then enforces the new policy, including tier changes, from that moment. On the parent\'s device, the Auditor Engine runs over the newly arrived logs in batch: it compares every justification against the raw session record and raises AuditFlags for the patterns listed in Section 8 --- leniency drift, false negatives, gaming, miscalibration, behavior shifts, inconsistency, and justifications that do not match the evidence. The parent reviews transcripts and flags in the admin app; nothing in this flow leaves either device.
+When both apps are open and the devices are nearby, the two Sync components connect over Bluetooth and exchange in both directions: new policy moves down from admin to child, and new session logs, transcripts, and decision justifications move up from child to admin. The child app then enforces the new policy, including tier changes, from that moment. On the parent\'s device, the Auditor Engine runs over the newly arrived logs in batch: it compares every justification against the raw session record and raises AuditFlags for the patterns listed in Section 8 --- leniency drift, false negatives, gaming, miscalibration, behavior shifts, inconsistency, and justifications that do not match the evidence. The parent reviews transcripts and flags in the admin app; nothing in this flow leaves either device. SessionLog payloads from the child now carry per-question practice records and the session effort snapshot (produced by SessionRecorder); the dashboard's detail cards read them.
 
 ### 5.6 Offline enforcement \[HLD-offline-enforcement\]
 
@@ -354,6 +355,7 @@ EarnPlay holds a small set of entity types, all stored on-device. This section n
   Chore pool and offers               The parent-stocked chores available for AI-offered trades, and the record of offers made, accepted, completed, and confirmed.
 
   Sync messages                       The units exchanged over Bluetooth: policy moving down to the child app, and logs, transcripts, and decisions moving up to the admin app.
+  SessionLog                          A session's synced log: questionRecords (per-question practice detail) and effort (session effort snapshot), alongside decisions and transcripts.
   -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Two properties hold across all entities. First, data lives where it is created until sync copies logs upward and policy downward; there is no central store. Second, the Decision and Transcript entities exist primarily so that a second system --- the auditor --- and a person --- the parent --- can check the tutor\'s work. They are not analytics exhaust; they are the audit trail the product promises.
@@ -496,7 +498,7 @@ Success criteria: (1) a child who tries hard earns the simulated unlock despite 
 
 Throwaway code: nothing from the pilot ships in the iOS app. It validates the interaction design and the agent workflow, then it is done. How its pieces map to the LLD modules is stated in LLD Section 14.1.
 
-Sequencing: pre-kickoff validation, sequenced before Epic 0. It informs the demo; it is not a submission gate, but it is Demo scope and part of the 38-task definition of done.
+Sequencing: pre-kickoff validation, sequenced before Epic 0. It informs the demo; it is not a submission gate, but it is Demo scope and part of the 39-task definition of done.
 
 ## Version 1 \[HLD-version-1\]
 
