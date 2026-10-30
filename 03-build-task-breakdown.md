@@ -11,7 +11,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **How to use this document**                                                                                                                                                                                                                                                                                                                                                                                                           |
 |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (38 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
+| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (39 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
 +========================================================================================================================================================================================================================================================================================================================================================================================================================================+
 
 +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -35,7 +35,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   3 --- Trades                         T3.1--T3.4 (4)    3 / 1 / 0                Movement trade, chore trade, offer logic; photo-proof in v1
 
-  4 --- Admin app                      T4.1--T4.6 (6)    4 / 2 / 0                Policy editor, dashboard, transcripts, decision log, auditor, sync
+  4 --- Admin app                      T4.1--T4.7 (7)    5 / 2 / 0                Policy editor, dashboard, transcripts, decision log, auditor, sync
 
   5 --- Assurance, demo, submission    T5.1--T5.5 (5)    5 / 0 / 0                Eval harness, red-teaming, versioning, demo staging, submission
 
@@ -45,7 +45,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   8 --- Pilot web PoC                  T8.1--T8.7 (7)    7 / 0 / 0                Web proof of concept of the core loop + switchable model backends (browser / local / cloud; tutor messages, parallel effort judge); validates the interaction design and tests coding-agent build performance
 
-  **Total**                            **52 tasks**      **38 / 9 / 5**           **Demo is the definition of done for the hackathon**
+  **Total**                            **53 tasks**      **39 / 9 / 5**           **Demo is the definition of done for the hackathon**
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Reading a task block:** Every task gives its ID and title, what to build, a verifiable acceptance line, its dependencies, its size, and its scope tag. Work a task only when its dependencies are done --- the dependency line is the gate, not a suggestion.
@@ -566,6 +566,24 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **References:** SSOT-canonical-facts-privacy; HLD-sync-and-audit; HLD-privacy-and-security-principles; LLD-sync-protocol; LLD-conflict-resolution-and-retry; APP-technical-approach; ENT-privacy-and-data-handling
 
+### T4.7 --- Child-side practice pipeline [TASKS-t4-7-child-side-practice-pipeline]
+
+**Size:** M --- about half a day • **Scope:** Demo • **Depends on:** T1.2, T1.3, T1.4, T1.6, T1.8, T4.6
+
+**What to build:** Record practice sessions in the child app as SessionLog detail: per-question records (questionId, skill, correct, idle-paused activeMs, hintsUsed, errorType for incorrect answers only) plus the session effort snapshot (T1.4 score vs threshold), built via SessionLog.make with the session's DecisionLogger decisions and enqueued to the existing T4.6 SessionLogQueue for sync. Unify the SessionLog schema without touching the auditor fields: dashboard detail lands as questionRecords / effort (the branch's questions name collides with the auditor's questions field).
+
+> **Inputs:** T1.2 verified questions + solver verdicts; T1.3 hint counts; T1.4 EffortScore/threshold; T1.6 DecisionLogger; T1.8 chat session lifecycle; T4.6 SessionLogQueue/store.
+>
+> **Outputs:** SessionLog records carrying questionRecords + effort, enqueued for sync; code-repo Docs/SessionRecording.md describing the producer and wire fields.
+>
+> **Automated test:** Scripted session asserting the produced SessionLog's questionRecords + effort match hand-computed values; normalization edge cases (counts clamp, strings trim, blank errorType -> nil, errorType dropped when correct); decode of decisions-only and auditor-only logs unchanged; queue round-trip (enqueue -> pending -> removeDelivered). Pass: all assertions green.
+>
+> **Manual test:** 1) Complete a known practice session on the child device (record your own accuracy by hand). 2) Sync. 3) Open the admin store — the session's log carries the per-question records and effort snapshot. 4) Compare accuracy to your hand record. Expected: exact match. (Dashboard-card population is verified after T4.2 merges).
+>
+> **✓ Acceptance criteria:** A scripted practice session produces a SessionLog whose records match hand math exactly; sessions without practice produce no records and nil effort (never invented); all gates green.
+>
+> **References:** SSOT-canonical-facts-scope; HLD-system-architecture; HLD-sync-and-audit; LLD-module-map; LLD-data-schemas; LLD-session; LLD-dashboard
+
 ## Epic 5 --- Assurance, demo, submission \[TASKS-epic-5-assurance-demo-submission\]
 
 ------------------------------------------------------------------------
@@ -1066,9 +1084,9 @@ The chains that matter most. If a task on the left slips, everything to its righ
   **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation; T8.4 → T8.6 Browser model → T8.7 Switchable endpoints (pre-kickoff validation; informs Epic 1)
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Demo definition of done --- 38 tasks \[TASKS-demo-definition-of-done-33-tasks\]
+## Demo definition of done --- 39 tasks \[TASKS-demo-definition-of-done-33-tasks\]
 
-**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.5, T4.6 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
+**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.5, T4.6, T4.7 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
 
 Held back until Demo is green: T0.4 (v1), T3.4 (v1), T4.3 (v1), T4.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.2 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
 
