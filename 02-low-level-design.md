@@ -66,6 +66,10 @@ Responsibility: Moves data between the two apps over MultipeerConnectivity (prot
 
 Responsibility: Writes an immutable Decision record for every consequential decision --- grant-unlock, deny-unlock, offer-trade, difficulty-change, and session-judgment --- including evidence summary, reasoning, alternative considered, and confidence, before the decision's effect is applied. Inputs: decision events from TutorEngine, EffortScorer, and the trade managers. Outputs: persisted Decision records, included in the SessionLog at sync. A decision without a log entry is a defect (see the justification-log tests in Section 12).
 
+### SessionRecorder [LLD-sessionrecorder]
+
+Responsibility: Records a practice session's detail for sync: one record per practised question (questionId, skill, correct, idle-paused activeMs, hintsUsed, errorType for incorrect answers only) and the session effort snapshot (T1.4 score vs threshold). Inputs: verified questions and solver verdicts, HintLadder hint counts, T1.4 EffortScore/threshold, and the session's DecisionLogger decisions. Outputs: a SessionLog carrying questionRecords and effort, enqueued to SessionLogQueue for the existing sync. It never invents a record, a score, or an error type.
+
 ### ModelRuntime (child app) \[LLD-modelruntime-child-app\]
 
 Responsibility: Loads and runs the quantized on-device model from the first-launch download in [LLD-model-integration] (Application Support joins the lookup order; an unverified model is never run), builds prompts from the fixed structure in Section 10, validates structured output, and enforces bounded regeneration with a safe fallback. Inputs: session context (skill profile, transcript, effort state) and the task for the current turn. Outputs: validated structured output (tutor text, hint, probe, or a proposed decision with justification fields), or a fallback response when validation fails after the retry bound.
@@ -82,7 +86,7 @@ Responsibility: The parent-facing editor for every Policy field in Section 2.1: 
 
 ### Dashboard \[LLD-dashboard\]
 
-Responsibility: Presents the parent view of progress: sessions, skills practised, skill trends over time, time spent, hint use, error patterns, and trade frequency. Inputs: synced Session, Attempt, Decision, and ChoreOffer records. Outputs: display only; the Dashboard writes no policy and changes no state.
+Responsibility: Presents the parent view of progress: sessions, skills practised, skill trends over time, time spent, hint use, error patterns, and trade frequency. Inputs: synced Session, Attempt, Decision, and ChoreOffer records, Session questionRecords and effort snapshots. Outputs: display only; the Dashboard writes no policy and changes no state.
 
 ### TranscriptViewer \[LLD-transcriptviewer\]
 
@@ -188,6 +192,10 @@ Authored in the admin app, versioned, and cached on the child device. The child 
   promptVersion           String                  Prompt version that ran the session.
 
   grade                   String                  Grade level of the skill profile (carried in skillProfileSnapshot). Demo value: "4".
+
+  questionRecords        List of per-question records One record per practised question (questionId, skill, correct, idle-paused activeMs, hintsUsed, errorType for incorrect only); empty when the session recorded no practice. Named questionRecords to avoid colliding with the auditor's questions field.
+
+  effort                 Effort snapshot, optional T1.4 score vs threshold for the session; nil when the session produced no score.
   ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## 2.3 Question \[LLD-question\]
@@ -561,7 +569,7 @@ Properties of the transport. The session is encrypted and needs no pairing codes
   ----------------------- ----------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   PolicyUpdate            Admin → child           Full Policy record with its version. Child applies it only if the version is higher than the stored version, then PolicyStore becomes the enforcement source and ShieldManager reconciles shields.
 
-  SessionLog              Child → admin           One session's transcript plus its Question, Attempt, and HintEvent records, its Decision records with justifications, and any ChoreOffer state changes. Sent once per completed session; retained on the child until delivery is confirmed by receipt at the admin app.
+  SessionLog              Child → admin           One session's transcript plus its Question, Attempt, and HintEvent records, its Decision records with justifications, and any ChoreOffer state changes, plus per-question practice records and the session effort snapshot. Sent once per completed session; retained on the child until delivery is confirmed by receipt at the admin app.
 
   AuditRequest            Admin-local             Not a network message. A parent action inside the admin app that starts an AuditorEngine run over already-synced logs.
 
