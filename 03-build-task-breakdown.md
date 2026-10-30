@@ -646,7 +646,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T5.4 --- Demo staging \[TASKS-t5-4-demo-staging\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.5, T4.6, T5.1, T5.2, T5.3, T7.1, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.5, T4.6, T4.7, T5.1, T5.2, T5.3, T7.1, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7
 
 **What to build:** Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies --- practice, movement, and chore; (4) the auditor catches a staged leniency error.
 
