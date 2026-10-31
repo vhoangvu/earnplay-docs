@@ -524,7 +524,7 @@ EarnPlay is built and released through an automated pipeline, so builds are prod
 
 ## The CI pipeline \[HLD-the-ci-pipeline\]
 
-On every push, CI --- Xcode Cloud or GitHub Actions macOS runners --- builds the project and runs the test suite automatically (Demo) --- unit tests plus, from T7.6, XCUITest UI smoke tests for the child app (launch and first-screen only; no model-download waiting) --- so no manual building is needed; archiving and uploading to TestFlight automatically is v1 (T7.2).
+On every push, CI --- Xcode Cloud or GitHub Actions macOS runners --- builds the project and runs the test suite automatically (Demo) --- unit tests plus, from T7.6, XCUITest UI smoke tests for the child app (launch and first-screen only; no model-download waiting) and, from T7.7, the full feature-walkthrough suite covering every child and admin feature with example data --- so no manual building is needed; archiving and uploading to TestFlight automatically is v1 (T7.2).
 
 ## Division of responsibility \[HLD-division-of-responsibility\]
 
