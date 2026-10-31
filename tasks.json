@@ -688,6 +688,20 @@
   "description": "Add an EarnPlayUITests XCUITest target in project.yml for the child app (EarnPlay), following the EarnPlayTests target pattern, included in the EarnPlay scheme's Test action; wire it into the existing xcodebuild test CI invocation from T7.1 so the UI tests run on the simulator alongside the unit tests; and add launch/first-screen smoke tests only. Smoke tests assert the child app launches and reaches its first screen without crashing, and that the first screen shows an element deterministically present on a fresh simulator (the model-download gate, ModelDownloadView); add accessibility identifiers to app code only where a test needs a stable handle. No full UI coverage, no UI test target for the admin app, no waiting for a model download in any test, and no app behavior changes beyond accessibility identifiers."
  },
  {
+  "id": "T7.7",
+  "title": "XCUITest full feature walkthrough",
+  "epic": 7,
+  "epic_title": "CI/CD and release automation",
+  "status": "not_started",
+  "size": "L",
+  "scope": "Demo",
+  "depends": [
+   "T7.1",
+   "T7.6"
+  ],
+  "description": "Extend the `EarnPlayUITests` XCUITest target from T7.6 (`project.yml`, EarnPlay scheme's Test action) with a deterministic feature-walkthrough suite that drives the PRODUCTION UI in a fixed order --- no scripted screens, no harness views --- through every feature with example data. Child app: first launch + model-download gate (assert the gate appears; never wait for a download); setup flow start to finish; a full practice session with example data (question presented, hint requested from the ladder, a wrong answer followed by a probe, session completion); all three unlock paths (effort-based unlock earned through practice; movement trade: offer, accept, completion; chore trade: offer, accept, confirm, granted); simulated shield (shields ON state, shield challenge, countdown); pairing sheet presentation, pre-invite code row, decline path; About screen + Llama license attribution. Admin app: dashboard empty state and fixture-seeded filled state; policy editor every section including below-the-fold sections; sessions list; pairing screen + code; auditor clean state and staged-finding state; version registry; sync debug screen. Each step asserts the expected screen or element is present; the suite fails if any step cannot reach its screen. Full two-device live pairing stays a manual T5.4/T7.5 item; the walkthrough covers what a single-simulator run can reach, plus the admin pairing screen. Deterministic fixtures/seeds (seeded chore pool, scripted practice session, staged leniency session matching the T5.4 demo-staging moments) live in the TEST target only, never in production code. Every walkthrough step captures a screenshot as a test artifact named by app + screen + step; tests must not depend on screenshot capture to pass --- a capture failure must not fail the suite. Document the exact command to run the suite under simulator video capture (`xcrun simctl io recordVideo`) so one command produces a full walkthrough recording for review. Wire the walkthrough into the existing `xcodebuild test` invocation from T7.1 so it runs on the simulator alongside the unit tests and the T7.6 smoke tests. No app behavior changes beyond accessibility identifiers needed for the tests; no changes to shields, sync transport, or model-download logic. Out of scope: real FamilyControls shields, performance/stress/soak testing, the T5.4 demo-staging rehearsal itself, T7.5 on-device verification, and narration/video assembly."
+ },
+ {
   "id": "T8.1",
   "title": "Pilot web scaffold",
   "epic": 8,
