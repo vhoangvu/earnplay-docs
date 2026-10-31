@@ -164,7 +164,7 @@ Every section heading in every EarnPlay document carries a stable unique ID, app
 
 ## CI/CD and release \[SSOT-ci-cd-and-release\]
 
-- **CI pipeline:** On every push, CI (Xcode Cloud or GitHub Actions macOS runners) builds the project and runs the test suite automatically (Demo) --- unit tests plus, from T7.6, XCUITest UI smoke tests for the child app (launch and first-screen only; no model-download waiting); archiving and uploading to TestFlight automatically is v1 (T7.2).
+- **CI pipeline:** On every push, CI (Xcode Cloud or GitHub Actions macOS runners) builds the project and runs the test suite automatically (Demo) --- unit tests plus, from T7.6, XCUITest UI smoke tests for the child app (launch and first-screen only; no model-download waiting) and, from T7.7, the full feature-walkthrough suite covering every child and admin feature with example data; archiving and uploading to TestFlight automatically is v1 (T7.2).
 
 - **Division of responsibility:** The assistant generates all code plus the CI configuration; the user does one-time account linking (push code to repo, connect repo to Xcode Cloud / add the App Store Connect API key), files the entitlement (T0.4), tests on-device, and owns App Store review.
 
@@ -239,3 +239,4 @@ Which derived docs mirror which sections of this document.
 2026-10-29              Model distribution decided (code-repo issue vhoangvu/earnplay#53): first-launch Wi-Fi download to Application Support, not bundled and not on-demand resources, sha256-verified; SSOT, HLD, LLD
 2026-10-30              Child-side practice pipeline decided (code-repo issue vhoangvu/earnplay#63): practice sessions record per-question detail + effort snapshot into SessionLog (questionRecords/effort); new task T4.7 (Demo, M); Demo definition of done 38 -> 39 tasks (53 total). SSOT, HLD, LLD, Task Breakdown 
 2026-10-31              XCUITest UI automation added (code-repo issue vhoangvu/earnplay#69): EarnPlayUITests target in project.yml for the child app, wired into the xcodebuild test CI invocation, launch/first-screen smoke tests only; new task T7.6 (Demo, S); Demo definition of done 39 -> 40 tasks (54 total). SSOT, HLD, LLD, Task Breakdown
+2026-10-31              XCUITest full feature walkthrough added (code-repo issue vhoangvu/earnplay#71): EarnPlayUITests feature-walkthrough suite driving the production UI through every child and admin feature with example data; new task T7.7 (Demo, L); Demo definition of done 40 -> 41 tasks (55 total). SSOT, HLD, LLD, Task Breakdown
