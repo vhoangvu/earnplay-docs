@@ -360,6 +360,24 @@
   "description": "Connect the two apps with MultipeerConnectivity over Bluetooth only. PolicyUpdate flows down to the child app; SessionLog flows up to the admin app. Handle versioning, queue messages while disconnected, and retry until delivered. Sync works when both apps are open and nearby."
  },
  {
+  "id": "T4.7",
+  "title": "Child-side practice pipeline",
+  "epic": 4,
+  "epic_title": "Admin app",
+  "status": "not_started",
+  "size": "M",
+  "scope": "Demo",
+  "depends": [
+   "T1.2",
+   "T1.3",
+   "T1.4",
+   "T1.6",
+   "T1.8",
+   "T4.6"
+  ],
+  "description": "Record practice sessions in the child app as SessionLog detail: per-question records (questionId, skill, correct, idle-paused activeMs, hintsUsed, errorType for incorrect answers only) plus the session effort snapshot (T1.4 score vs threshold), built via SessionLog.make with the session's DecisionLogger decisions and enqueued to the existing T4.6 SessionLogQueue for sync. Unify the SessionLog schema without touching the auditor fields: dashboard detail lands as questionRecords / effort (the branch's questions name collides with the auditor's questions field)."
+ },
+ {
   "id": "T5.1",
   "title": "Eval harness",
   "epic": 5,
@@ -655,6 +673,19 @@
    "T7.1"
   ],
   "description": "Manual task, user. Install the current dev build on the user\\'s iPhone and verify every demo moment on the real device, recording a pass/fail verification report per moment. (TestFlight verification is v1, with T7.2; Demo verification uses a local/dev build, with simulated shields where real shields are unavailable.)"
+ },
+ {
+  "id": "T7.6",
+  "title": "XCUITest UI automation target with smoke tests",
+  "epic": 7,
+  "epic_title": "CI/CD and release automation",
+  "status": "not_started",
+  "size": "S",
+  "scope": "Demo",
+  "depends": [
+   "T7.1"
+  ],
+  "description": "Add an EarnPlayUITests XCUITest target in project.yml for the child app (EarnPlay), following the EarnPlayTests target pattern, included in the EarnPlay scheme's Test action; wire it into the existing xcodebuild test CI invocation from T7.1 so the UI tests run on the simulator alongside the unit tests; and add launch/first-screen smoke tests only. Smoke tests assert the child app launches and reaches its first screen without crashing, and that the first screen shows an element deterministically present on a fresh simulator (the model-download gate, ModelDownloadView); add accessibility identifiers to app code only where a test needs a stable handle. No full UI coverage, no UI test target for the admin app, no waiting for a model download in any test, and no app behavior changes beyond accessibility identifiers."
  },
  {
   "id": "T8.1",
