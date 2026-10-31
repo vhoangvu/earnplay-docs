@@ -792,7 +792,7 @@ Workflow definition. The pipeline is defined in a CI workflow file --- ci.yml fo
 
 > 1\. **Build ---** xcodebuild build.
 >
-> 2\. **Test ---** xcodebuild test (unit tests plus, from T7.6, the EarnPlayUITests XCUITest UI smoke tests for the child app: launch and first-screen only, no model-download waiting).
+> 2\. **Test ---** xcodebuild test (unit tests plus, from T7.6, the EarnPlayUITests XCUITest UI smoke tests for the child app: launch and first-screen only, no model-download waiting, plus, from T7.7, the full feature-walkthrough suite covering every child and admin feature with example data).
 >
 > 3\. **Archive (v1, T7.2) ---** xcodebuild archive.
 >
