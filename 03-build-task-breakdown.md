@@ -8,10 +8,11 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ------------------------------------------------------------------------
 
-+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
++
 | **How to use this document**                                                                                                                                                                                                                                                                                                                                                                                                           |
 |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (39 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
+| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (40 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
 +========================================================================================================================================================================================================================================================================================================================================================================================================================================+
 
 +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -41,11 +42,11 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   6 --- v1 hardening                   T6.1--T6.8 (8)    0 / 3 / 5                App Store path first; Band A screen variants and grade-banded copy packs in v1; multi-child, speech, curriculum and more later
 
-  7 --- CI/CD and release automation   T7.1--T7.5 (5)    3 / 2 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification; App Store submission prep in v1
+  7 --- CI/CD and release automation   T7.1--T7.6 (6)    4 / 2 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification; App Store submission prep in v1
 
   8 --- Pilot web PoC                  T8.1--T8.7 (7)    7 / 0 / 0                Web proof of concept of the core loop + switchable model backends (browser / local / cloud; tutor messages, parallel effort judge); validates the interaction design and tests coding-agent build performance
 
-  **Total**                            **53 tasks**      **39 / 9 / 5**           **Demo is the definition of done for the hackathon**
+  **Total**                            **54 tasks**      **40 / 9 / 5**           **Demo is the definition of done for the hackathon**
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Reading a task block:** Every task gives its ID and title, what to build, a verifiable acceptance line, its dependencies, its size, and its scope tag. Work a task only when its dependencies are done --- the dependency line is the gate, not a suggestion.
@@ -646,7 +647,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
 ### T5.4 --- Demo staging \[TASKS-t5-4-demo-staging\]
 
-**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.5, T4.6, T4.7, T5.1, T5.2, T5.3, T7.1, T7.3, T7.5, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T0.1, T0.2, T0.3, T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8, T2.1, T2.2, T2.3, T2.4, T2.5, T3.1, T3.2, T3.3, T4.1, T4.2, T4.5, T4.6, T4.7, T5.1, T5.2, T5.3, T7.1, T7.3, T7.5, T7.6, T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7
 
 **What to build:** Stage the four demo moments so they run live: (1) a hard-trying child earns an unlock despite wrong answers; (2) an idling child earns nothing; (3) all three currencies --- practice, movement, and chore; (4) the auditor catches a staged leniency error.
 
@@ -926,6 +927,15 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 >
 > **References:** SSOT-ci-cd-and-release; HLD-ci-cd-and-release-process; LLD-ci-cd-pipeline; LLD-demo-mapping-real-vs-simulated-in-the-10-day-demo
 
+### T7.6 --- XCUITest UI automation target with smoke tests [TASKS-t7-6-xcuitest-ui-automation-target-with-smoke-tests] 
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T7.1 
+**What to build:** Add an EarnPlayUITests XCUITest target in project.yml for the child app (EarnPlay), following the EarnPlayTests target pattern, included in the EarnPlay scheme's Test action; wire it into the existing xcodebuild test CI invocation from T7.1 so the UI tests run on the simulator alongside the unit tests; and add launch/first-screen smoke tests only. Smoke tests assert the child app launches and reaches its first screen without crashing, and that the first screen shows an element deterministically present on a fresh simulator (the model-download gate, ModelDownloadView); add accessibility identifiers to app code only where a test needs a stable handle. No full UI coverage, no UI test target for the admin app, no waiting for a model download in any test, and no app behavior changes beyond accessibility identifiers. 
+> **Inputs:** T7.1 CI pipeline with its existing xcodebuild test invocation; project.yml with the EarnPlayTests target pattern; child app target (EarnPlay) and its first screen (ModelDownloadView, the model-download gate on a fresh simulator).
+> **Outputs:** EarnPlayUITests XCUITest target in project.yml, generated by xcodegen and included in the EarnPlay scheme's Test action; CI invocation running the UI tests on the simulator alongside the unit tests; launch/first-screen smoke tests for the child app.
+> **Automated test:** xcodegen generate produces the EarnPlayUITests target and it builds; xcodebuild test on the simulator runs the UI tests (locally with ONLY_ACTIVE_ARCH=YES; on CI with the existing invocation); the smoke tests pass locally and on CI, asserting launch to the first screen without waiting for the model download.
+> **Manual test:** 1) Run xcodebuild test on the simulator and open the test report. Expected: the EarnPlayUITests smoke tests are listed and pass. 2) Launch a plain Debug build of the child app on the simulator. Expected: it launches with no runpath override flag, as in PR #68.
+> **✓ Acceptance criteria:** xcodegen generate produces a buildable EarnPlayUITests target; xcodebuild test on the simulator runs the UI tests locally and on CI and the smoke tests pass; the plain Debug build still launches on the simulator with no LD_RUNPATH_SEARCH_PATHS override (no regression of PR #68); no app behavior changes beyond accessibility identifiers needed for the tests; no full UI coverage and no admin-app UI target.
+> **References:** SSOT-ci-cd-and-release; HLD-ci-cd-and-release-process; LLD-ci-cd-pipeline
 ## Epic 8 --- Pilot web PoC \[TASKS-epic-8-pilot-web-poc\]
 
 ------------------------------------------------------------------------
@@ -1084,9 +1094,9 @@ The chains that matter most. If a task on the left slips, everything to its righ
   **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation; T8.4 → T8.6 Browser model → T8.7 Switchable endpoints (pre-kickoff validation; informs Epic 1)
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Demo definition of done --- 39 tasks \[TASKS-demo-definition-of-done-33-tasks\]
+## Demo definition of done --- 40 tasks \[TASKS-demo-definition-of-done-33-tasks\]
 
-**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.5, T4.6, T4.7 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.3, T7.5 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
+**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.5, T4.6, T4.7 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.3, T7.5, T7.6 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
 
 Held back until Demo is green: T0.4 (v1), T3.4 (v1), T4.3 (v1), T4.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.2 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
 
