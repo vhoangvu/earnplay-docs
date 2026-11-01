@@ -715,6 +715,19 @@
   "description": "Build the single theme source the design docs already require (SSOT/HLD: `DesignSystem` in EarnPlayCore, no hardcoded visual values outside it) as a real switchable theme system carrying the colors and styles from Main Page Style Explorations (`earnplay_main_page_styles.html`): 14 themes, 7 palettes (Calm Forest, Warm Playful, Sky Blueprint, System Native, Canonical, Blush Pink, Hot Pink) \u00d7 rounded/sharp shapes, each theme defined by its 3 swatch colors and carrying the full token set from that file (background, header, tutor bubble, child bubble, accent, track, fill, star fill/empty, card/button/bubble radii). Rounded themes use card radius 14, button radius 10, and bubble radius 20; sharp themes use card radius 10, button radius 8, and bubble radius 8. A `ThemeStore` in EarnPlayCore holds each app's selection, persists it across launches, and defaults to Canonical (the docs palette), so today's screenshots and walkthrough still match. Migrate the 13 hardcoded `Color(` sites in the app targets (child: ChatConversation, StallProbePreviewView, MovementTradeViews, ChoreTradeView, SimulatedShieldView, ReadAloudPreviewView; admin: DashboardView) onto DesignSystem tokens; no other behavior changes. Add a theme picker to the child app's About screen and the admin app's Version tab, each listing the 14 file names. Color is never the only signal: stars keep their filled/empty shapes and labels in every theme."
  },
  {
+  "id": "T7.9",
+  "title": "Light Pink palette for the theme system",
+  "epic": 7,
+  "epic_title": "CI/CD and release automation",
+  "status": "not_started",
+  "size": "S",
+  "scope": "Demo",
+  "depends": [
+   "T7.8"
+  ],
+  "description": "Extend the T7.8 theme system with the Light Pink palette from Main Page Style Explorations (mockup variants 15/16): add one `Palette` case (`lightPink`) carrying the full 12-token set (background #fff5f8, headerBackground #f472a0, headerText #ffffff, tutorBackground #fde7ef, tutorText #7a2148, childBackground #f9a8d4, childText #7a2148, accent #f9a8d4, track #f9d6e2, fill #f9a8d4, starFill #f472a0, starEmpty #f3c2d3) with swatches #f472a0 / #f9a8d4 / #fff5f8, giving two new themes (light-pink-rounded, light-pink-sharp; 16 total) that appear automatically in both apps' pickers via `allThemes`. Resolved text: child text keeps prescribed #7a2148 (5.41:1 on the child bubble); header text uses the dark overlay #111111 (6.98:1 on the rose header; prescribed white is 2.71:1 and fails). Accent deliberately equals the child background (#f9a8d4), not the mockup class's `--accent` (#f472a0), so Send/Start-again labels keep 5.41:1 (they would fall to 3.63:1 on the rose accent); record this deviation in the verbatim-table test. Default stays Canonical; no other behavior changes."
+ },
+ {
   "id": "T8.1",
   "title": "Pilot web scaffold",
   "epic": 8,
