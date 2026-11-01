@@ -460,6 +460,24 @@ Because answers come from the solver and not from the model, a model error canno
 
 Demo content for the solver (from T0.3/T1.1, recorded here so those tasks' "from the LLD" inputs hold): the 4th-grade skill list is multiplication facts to 12x12, multi-digit multiplication, division, fraction comparison and addition, and word problems, plus reading items whose answers are verified against their passage text (step 3 above). The diagnostic item set is 10 minutes across facts fluency, fractions, word problems, reading fluency, and comprehension.
 
+# 5. Theme system \[LLD-theme\]
+
+## 5.1 Theme tokens and selection \[LLD-theme-system\]
+
+- `Theme` (value type, EarnPlayCore): `name` (the Main Page Style Explorations file name, e.g. "Calm Forest, rounded"); three swatch colors (header, accent, background as listed in the file); and the full token set copied verbatim from that file's palette classes: `background`, `headerBackground`, `headerText`, `tutorBackground`, `tutorText`, `childBackground`, `childText`, `accent`, `track`, `fill`, `starFill`, `starEmpty`, plus radii `cardRadius`, `buttonRadius`, `bubbleRadius`. The 3 swatch colors are the theme's identity in the picker; views render the full set --- no tint math is invented at runtime.
+- The 14 themes (palette × shape). Palette token sets (rounded and sharp share the palette; only radii differ):
+  - Calm Forest --- swatches #1e5c46 / #2e7d5b / #faf6ee; tokens: background #faf6ee, headerBackground #1e5c46, headerText #ffffff, tutorBackground #e3efe7, tutorText #1c3a2d, childBackground #2e7d5b, childText #ffffff, accent #2e7d5b, track #e0dccf, fill #2e7d5b, starFill #2e7d5b, starEmpty #cfc8b4.
+  - Warm Playful --- swatches #ff6b5b / #ffc93c / #fff9f0; tokens: background #fff9f0, headerBackground #ff6b5b, headerText #ffffff, tutorBackground #ffe9e2, tutorText #5c2a24, childBackground #ff6b5b, childText #ffffff, accent #ff6b5b, track #f3e3cf, fill #ffc93c, starFill #ffc93c, starEmpty #e8d9c4.
+  - Sky Blueprint --- swatches #12395b / #1f6feb / #f2f7fc; tokens: background #f2f7fc, headerBackground #12395b, headerText #ffffff, tutorBackground #e1edf7, tutorText #16324a, childBackground #1f6feb, childText #ffffff, accent #1f6feb, track #d9e6f2, fill #1f6feb, starFill #1f6feb, starEmpty #c3d5e8.
+  - System Native --- swatches #007aff / #e9e9eb / #ffffff; tokens: background #ffffff, headerBackground #f2f2f7, headerText #111111, tutorBackground #e9e9eb, tutorText #111111, childBackground #007aff, childText #ffffff, accent #007aff, track #e9e9eb, fill #007aff, starFill #007aff, starEmpty #d1d1d6.
+  - Canonical --- swatches #4361ee / #ffb703 / #f7f8fc; tokens: background #f7f8fc, headerBackground #4361ee, headerText #ffffff, tutorBackground #ffffff, tutorText #1b1b2f, childBackground #4361ee, childText #ffffff, accent #4361ee, track #e2e4f0, fill #4361ee, starFill #ffb703, starEmpty #d0d0e0.
+  - Blush Pink --- swatches #c2255c / #f06595 / #fff7f9; tokens: background #fff7f9, headerBackground #c2255c, headerText #ffffff, tutorBackground #ffe3ec, tutorText #57182e, childBackground #f06595, childText #ffffff, accent #f06595, track #f8d7e0, fill #f06595, starFill #ffc2d4, starEmpty #a63a63.
+  - Hot Pink --- swatches #a61e4d / #f72585 / #fff0f5; tokens: background #fff0f5, headerBackground #a61e4d, headerText #ffffff, tutorBackground #ffd6e8, tutorText #4a0e2e, childBackground #f72585, childText #ffffff, accent #f72585, track #f5c6da, fill #f72585, starFill #ff8fab, starEmpty #8e2a5b.
+- Radii: rounded --- cardRadius 14, buttonRadius 10, bubbleRadius 20. Sharp --- cardRadius 10, buttonRadius 8, bubbleRadius 8.
+- `ThemeStore` (ObservableObject, EarnPlayCore): persisted selection (`@AppStorage`, default Canonical); exposed to views through the environment; switching re-renders subscribed views with no restart. Each app has its own store instance and picker (child: About screen; admin: Version tab); selections persist per app, since the apps share no defaults.
+- Migration rule (HLD code-structure rule): views read tokens only through DesignSystem/ThemeStore; a reviewer rejects any hardcoded `Color`, font size, or spacing value outside the theme source. Demo migration covers the child chat, shields, trades, read-aloud, and About surfaces plus the admin dashboard.
+- Accessibility: color is never the only signal --- stars use filled/empty glyphs, shields use a lock icon plus words, status uses labels, in every theme.
+
 # 6. Shield manager \[LLD-shield-manager\]
 
 ![Figure 3 --- Shield unlock and re-lock sequence: the grant Decision is logged first, the shield is removed for the Policy duration measured on the monotonic clock, and the shield is re-applied at expiry.](media/media/image3.png){width="6.9in" height="6.0in"}
