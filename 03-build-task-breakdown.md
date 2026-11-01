@@ -12,7 +12,7 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 +
 | **How to use this document**                                                                                                                                                                                                                                                                                                                                                                                                           |
 |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (42 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
+| Work top-down by epic --- finish an epic\'s tasks in order before moving on, unless a dependency explicitly allows parallel work. Demo-tagged tasks are the entire 10-day hackathon scope (43 tasks). Do not start v1 or Future tasks until every Demo task is green against its acceptance criteria. Each task is sized to be picked up and finished on its own: if a task cannot be verified by its acceptance line, it is not done. |
 +========================================================================================================================================================================================================================================================================================================================================================================================================================================+
 
 +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -42,11 +42,11 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 
   6 --- v1 hardening                   T6.1--T6.8 (8)    0 / 3 / 5                App Store path first; Band A screen variants and grade-banded copy packs in v1; multi-child, speech, curriculum and more later
 
-  7 --- CI/CD and release automation   T7.1--T7.8 (8)    6 / 2 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification, theme system; App Store submission prep in v1
+  7 --- CI/CD and release automation   T7.1--T7.9 (9)    7 / 2 / 0                CI pipeline, automated TestFlight upload, release versioning and on-device verification, theme system, Light Pink palette; App Store submission prep in v1
 
   8 --- Pilot web PoC                  T8.1--T8.7 (7)    7 / 0 / 0                Web proof of concept of the core loop + switchable model backends (browser / local / cloud; tutor messages, parallel effort judge); validates the interaction design and tests coding-agent build performance
 
-  **Total**                            **56 tasks**      **42 / 9 / 5**           **Demo is the definition of done for the hackathon**
+  **Total**                            **57 tasks**      **43 / 9 / 5**           **Demo is the definition of done for the hackathon**
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Reading a task block:** Every task gives its ID and title, what to build, a verifiable acceptance line, its dependencies, its size, and its scope tag. Work a task only when its dependencies are done --- the dependency line is the gate, not a suggestion.
@@ -957,6 +957,16 @@ Two apps: the EarnPlay child app (tutor, challenge, locking and trades on the ch
 > **✓ Acceptance criteria:** The 14 themes match the mockup file's palettes, swatch trios, and rounded/sharp radii; Canonical is the default; the selection persists; no hardcoded colors remain in the app targets outside DesignSystem; the picker lists all 14 file names; admin renders the selected theme with its own picker; no behavior changes beyond theming; CI green on the PR.
 > **References:** SSOT-tech-stack; HLD-design-system; LLD-theme-system
 
+### T7.9 --- Light Pink palette for the theme system [TASKS-t7-9-light-pink-palette]
+**Size:** S --- under 2 hours • **Scope:** Demo • **Depends on:** T7.8
+**What to build:** Extend the T7.8 theme system with the Light Pink palette from Main Page Style Explorations (mockup variants 15/16): add one `Palette` case (`lightPink`) carrying the full 12-token set (background #fff5f8, headerBackground #f472a0, headerText #ffffff, tutorBackground #fde7ef, tutorText #7a2148, childBackground #f9a8d4, childText #7a2148, accent #f9a8d4, track #f9d6e2, fill #f9a8d4, starFill #f472a0, starEmpty #f3c2d3) with swatches #f472a0 / #f9a8d4 / #fff5f8, giving two new themes (light-pink-rounded, light-pink-sharp; 16 total) that appear automatically in both apps' pickers via `allThemes`. Resolved text: child text keeps prescribed #7a2148 (5.41:1 on the child bubble); header text uses the dark overlay #111111 (6.98:1 on the rose header; prescribed white is 2.71:1 and fails). Accent deliberately equals the child background (#f9a8d4), not the mockup class's `--accent` (#f472a0), so Send/Start-again labels keep 5.41:1 (they would fall to 3.63:1 on the rose accent); record this deviation in the verbatim-table test. Default stays Canonical; no other behavior changes.
+> **Inputs:** Main Page Style Explorations mockup file (Light Pink variants 15/16); LLD theme-system section (updated token table + resolved-text note); existing DesignSystem/ThemeStore.
+> **Outputs:** `lightPink` palette case + token block; 16 themes; updated ThemeStoreTests (count, picker names, token table, swatch trio, resolved-text expectations); pickers in both apps list Light Pink.
+> **Automated test:** ThemeStoreTests + ThemeContrastFix2/Fix4 tests green (all contrast floors hold for Light Pink; tightest is secondary-on-theme at 4.64:1); existing unit + UI suites green locally (ONLY_ACTIVE_ARCH=YES) and on CI (Xcode 16.4 / iPhoneSimulator18.5 toolchain).
+> **Manual test:** 1) Launch the child app, open About, switch to Light Pink rounded. Expected: chat, shields, trades, and About re-render in pale pink with rounded shapes; header text is dark and readable. 2) Force-quit and relaunch. Expected: Light Pink rounded is still selected. 3) Switch to Light Pink sharp. Expected: same palette with squared shapes. 4) Open the admin Version tab. Expected: Light Pink appears in the admin picker too.
+> **✓ Acceptance criteria:** Both Light Pink themes match the mockup palette (with the documented accent deviation); Canonical is still the default; selection persists per app; all contrast floors hold; pickers in both apps list Light Pink; CI green on the PR.
+> **References:** SSOT-tech-stack; HLD-design-system; LLD-theme-system
+
 ## Epic 8 --- Pilot web PoC \[TASKS-epic-8-pilot-web-poc\]
 
 ------------------------------------------------------------------------
@@ -1115,9 +1125,9 @@ The chains that matter most. If a task on the left slips, everything to its righ
   **Pilot**                           T8.1 Scaffold → T8.2 Bank, T8.3 Scorer → T8.4 Transcript → T8.5 Agent evaluation; T8.4 → T8.6 Browser model → T8.7 Switchable endpoints (pre-kickoff validation; informs Epic 1)
   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-## Demo definition of done --- 42 tasks \[TASKS-demo-definition-of-done-33-tasks\]
+## Demo definition of done --- 43 tasks \[TASKS-demo-definition-of-done-33-tasks\]
 
-**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.5, T4.6, T4.7 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.3, T7.5, T7.6, T7.7, T7.8 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
+**The hackathon build is done when every task below passes its acceptance line:** Epic 0: T0.1, T0.2, T0.3 • Epic 1: T1.1, T1.2, T1.3, T1.4, T1.5, T1.6, T1.7, T1.8 • Epic 2: T2.1, T2.2, T2.3, T2.4, T2.5 • Epic 3: T3.1, T3.2, T3.3 • Epic 4: T4.1, T4.2, T4.5, T4.6, T4.7 • Epic 5: T5.1, T5.2, T5.3, T5.4, T5.5 • Epic 7: T7.1, T7.3, T7.5, T7.6, T7.7, T7.8, T7.9 • Epic 8: T8.1, T8.2, T8.3, T8.4, T8.5, T8.6, T8.7.
 
 Held back until Demo is green: T0.4 (v1), T3.4 (v1), T4.3 (v1), T4.4 (v1), T6.1 (v1), T6.7 (v1), T6.8 (v1), T7.2 (v1), T7.4 (v1), and T6.2--T6.6 (Future). If time runs short, cut from the end of this list\'s epics --- never cut T0.3 (solver), T1.4 (effort floor), T5.1--T5.2 (assurance), or T2.4 (the fallback that guarantees a demoable flow).
 
